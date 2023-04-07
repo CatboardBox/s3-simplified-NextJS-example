@@ -2,15 +2,15 @@ import {Readable} from "stream";
 import {Metadata} from "./metadata";
 
 export class S3Object {
-    constructor(public data: Readable, public metadata: Metadata) {
+    constructor(public data: Readable | ReadableStream | Blob | string | Uint8Array | Buffer, public metadata: Metadata) {
     }
 
-    /**
-     * @returns the size of the data in bytes
-     */
-    public getDataSize(): number {
-        return this.data.readableLength;
-    }
+    // /**
+    //  * @returns the size of the data in bytes
+    //  */
+    // public getDataSize(): number {
+    //     return this.data.readableLength;
+    // }
 
     /**
      * @returns the data file type (e.g. "image/jpeg")

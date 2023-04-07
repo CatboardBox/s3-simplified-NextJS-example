@@ -13,7 +13,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             "Content-Type": req.headers["content-type"],
         });
         const filestream = req.body;
-        const s3Object = new S3Object(filestream, metadata)
+        const numbers = filestream.trim().split(/\s*,\s*/g).map(x => x/1);
+        const binstr = String.fromCharCode(...numbers);
+        const b64str = btoa(binstr);
+        const s3Object = new S3Object(b64str, metadata)
         console.log("====================================");
         console.log(s3Object);
         console.log("====================================");
