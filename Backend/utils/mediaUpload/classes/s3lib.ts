@@ -28,7 +28,7 @@ export class S3Lib {
     }
 
     public async listBuckets(): Promise<Array<string>> {
-        const command = new ListBucketsCommand();
+        const command = new ListBucketsCommand({});
         const response = await this.s3.send(command);
         return response.Buckets ?
             response.Buckets.map(bucket => bucket.Name || '[unknown]')
@@ -44,14 +44,14 @@ export class S3Lib {
         if (await this.containsBucket(bucketName)) {
             return this.getBucketNoChecks(bucketName);
         }
-        throw new Error("Bucket does not exist: " + bucketName);
     }
 
     public async getOrCreateBucket(bucketName: string): Promise<S3Bucket> {
-        console.log("Getting or creating bucket: " + bucketName)
         if (await this.containsBucket(bucketName)) {
+            console.log("Get or creating bucket: " + bucketName + " (Get)")
             return this.getBucketNoChecks(bucketName);
         }
+        console.log("Get or creating bucket: " + bucketName + " (Create)")
         return this.createBucket(bucketName);
     }
 
@@ -60,15 +60,12 @@ export class S3Lib {
     }
 
     async containsBucket(bucketName: string): Promise<boolean> {
-        console.log("Checking if bucket exists: " + bucketName);
         try {
             const command = new HeadBucketCommand({Bucket: bucketName});
             await this.s3.send(command);
-            console.log("Bucket exists: " + bucketName);
             return true;
         } catch (error) {
             if (error.name === undefined || error.name !== "NoSuchBucket") throw error;
-            console.log("Bucket does not exist: " + bucketName);
             return false;
         }
     }

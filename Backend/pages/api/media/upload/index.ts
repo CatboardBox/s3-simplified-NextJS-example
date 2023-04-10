@@ -1,48 +1,80 @@
-import {NextApiRequest, NextApiResponse} from 'next'
-import {S3Lib} from 'utils/mediaUpload/classes/s3lib'
+import {NextApiRequest, NextApiResponse} from 'next';
+import formidable, {File} from 'formidable';
 import {S3Object} from "../../../../utils/mediaUpload/classes/s3Object";
 import {Metadata} from "../../../../utils/mediaUpload/classes/metadata";
-import * as process from "process";
+import fs from 'fs';
+import {S3Lib} from "../../../../utils/mediaUpload/classes/s3lib";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const log = (name, data) => {
+    fs.writeFile(name, data, (err: any) => {
+        if (err) {
+            console.error(err)
+            return
+        }
+        //file written successfully
+    })
+}
+
+const writeFile = async (s3Object: S3Object) => {
+    const data = s3Object.data;
+    log('test.txt', data)
+    log('test.jpg', data)
     const lib = new S3Lib("ap-southeast-1", process.env.AccessKey, process.env.SecretAccessKey);
-    try {
-        //generate uuid
-        const uuid: string = generateUUID();
-        const metadata = new Metadata({
-            "Content-Type": req.headers["content-type"],
-        });
-        const filestream = req.body;
-        const numbers = filestream.trim().split(/\s*,\s*/g).map(x => x/1);
-        const binstr = String.fromCharCode(...numbers);
-        const b64str = btoa(binstr);
-        const s3Object = new S3Object(b64str, metadata)
-        console.log("====================================");
-        console.log(s3Object);
-        console.log("====================================");
-        //get file type
-        const fileType = req.headers["content-type"]; //image/jpeg or image/png
-        //remove the first part of the string
-        const fileExtension = "." + fileType.split("/")[1];
-        //create a new file name
-        const fileName = uuid + fileExtension;
-        const imagesBucket = await lib.getOrCreateBucket("imagebuckettesting");
-        await imagesBucket.createObject(fileName, s3Object);
-        res.status(200).json({statusCode: 200, message: "success"})
-    } catch (err: any) {
-        res.status(500).json({statusCode: 500, message: err.message})
-    }
+    const imagesBucket = await lib.getOrCreateBucket("imagebuckettesting");
+    await imagesBucket.createObject(s3Object);
 }
-const generateUUID = () => {
-    let d = new Date().getTime();
-    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
-        d += performance.now(); //use high-precision timer if available
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
-}
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+    if (req.method === 'POST') {
+        try {
+            const data = await parseFormData(req);
+            const uploadedFile: File = data.files.file
 
-export default handler
+            const metadata = new Metadata({
+                "Content-Type": uploadedFile.mimetype,
+                "Content-Length": uploadedFile.size,
+                "Original-Name": uploadedFile.originalFilename,
+                "Content-Disposition": uploadedFile.newFilename,
+            });
+            const fileLocation = uploadedFile.filepath;
+            const buffer: Buffer = fs.readFileSync(fileLocation)
+
+            const s3Object = new S3Object(buffer, metadata)
+
+            console.log("====================================");
+            console.log(s3Object);
+            console.log("====================================");
+
+            await writeFile(s3Object);
+
+
+            res.status(200).json({message: 'File uploaded successfully', data});
+        } catch (error) {
+            console.error('Error processing file upload:', error);
+            res.status(500).json({message: 'Error processing file upload'});
+        }
+    } else {
+        res.status(405).json({message: 'Method not allowed'});
+    }
+};
+
+const parseFormData = (req: NextApiRequest): Promise<formidable.Fields & formidable.Files> => {
+    return new Promise((resolve, reject) => {
+        const form = new formidable.IncomingForm();
+
+        form.parse(req, (err, fields, files) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            resolve({fields, files});
+        });
+    });
+};
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+
+export default handler;

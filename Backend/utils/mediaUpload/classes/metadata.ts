@@ -1,5 +1,5 @@
 export class Metadata {
-    constructor(public metadata: { [key: string]: string } = {}) {
+    constructor(private metadata: { [key: string]: string } = {}) {
     }
 
     public getMetadata(key: string): string | undefined {
@@ -51,7 +51,12 @@ export class Metadata {
     }
 
     public asRecord(): Record<string, string> {
-        return {...this.metadata};
+        const record: Record<string, string> = {};
+        for (const key in this) {
+            if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
+            record[key] = String(this[key]);
+        }
+        return record;
     }
 }
 
