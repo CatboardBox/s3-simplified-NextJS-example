@@ -31,20 +31,16 @@ export const ImageList: React.FC<Props> = ({data}) => {
         return acceptedExtensions.includes(fileExtension);
     });
     return (
-        <p>
+        <>
             <h2>Images</h2>
-            <table>
-                <tr>
-                    {
-                        filteredData.map((item: string) => {
-                            return <td>
-                                <img src={item} alt={item} key={item}/>
-                                <button onClick={RemoveImage(item)}>Remove</button>
-                            </td>;
-                        })
-                    }
-                </tr>
-            </table>
-        </p>
+            {
+                filteredData.map((item: string) => {
+                    return <>
+                        <img src={item} alt={item} key={item}/>
+                        <button onClick={RemoveImage(item)}>Remove</button>
+                    </>;
+                })
+            }
+        </>
     );
 };
