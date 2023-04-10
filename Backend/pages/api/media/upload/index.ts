@@ -5,20 +5,20 @@ import {Metadata} from "../../../../utils/mediaUpload/classes/metadata";
 import fs from 'fs';
 import {S3Lib} from "../../../../utils/mediaUpload/classes/s3lib";
 
-const log = (name, data) => {
-    fs.writeFile(name, data, (err: any) => {
-        if (err) {
-            console.error(err)
-            return
-        }
-        //file written successfully
-    })
-}
+// const log = (name, data) => {
+//     fs.writeFile(name, data, (err: any) => {
+//         if (err) {
+//             console.error(err)
+//             return
+//         }
+//         //file written successfully
+//     })
+// }
 
 const writeFile = async (s3Object: S3Object) => {
     const data = s3Object.data;
-    log('test.txt', data)
-    log('test.jpg', data)
+    // log('test.txt', data)
+    // log('test.jpg', data)
     const lib = new S3Lib("ap-southeast-1", process.env.AccessKey, process.env.SecretAccessKey);
     const imagesBucket = await lib.getOrCreateBucket("imagebuckettesting");
     await imagesBucket.createObject(s3Object);
@@ -40,9 +40,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
             const s3Object = new S3Object(buffer, metadata)
 
-            console.log("====================================");
-            console.log(s3Object);
-            console.log("====================================");
+            // console.log("====================================");
+            // console.log(s3Object);
+            // console.log("====================================");
 
             await writeFile(s3Object);
 

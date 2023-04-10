@@ -2,7 +2,19 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {S3Lib} from "../../../../utils/mediaUpload/classes/s3lib";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+    console.log('Request received')
+    // Add CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    if (req.method === 'OPTIONS') {
+        // Preflight request. Reply successfully:
+        res.status(200).json({ message: 'Preflight request successful' });
+        return;
+    }
     if (req.method === 'DELETE') {
+        console.log('Delete request received')
         const {id} = req.query;
 
         if (!id) {
