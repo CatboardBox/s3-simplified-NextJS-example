@@ -31,12 +31,6 @@ export class S3Bucket {
     }
 
     async createObject(s3Object: S3Object): Promise<void> {
-        console.log({
-            Bucket: this.bucketName,
-            Key: s3Object.FileName,
-            Body: s3Object.data,
-            Metadata: s3Object.metadata.asRecord()
-        })
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: s3Object.FileName,
