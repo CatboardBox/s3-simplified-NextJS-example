@@ -5,7 +5,6 @@ import {ImageList} from "../components/ImageList";
 import {UploadImage} from "../components/UploadImage";
 import {ApiData} from "../interfaces";
 
-
 interface IndexPageProps {
     data: ApiData[];
 }

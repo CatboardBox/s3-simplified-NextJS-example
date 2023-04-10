@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
+import reloadPage from "../util/ReloadPage";
 
 const acceptedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'];
 const uploadUrl = 'http://localhost:3000/api/media/upload';
@@ -26,12 +27,12 @@ export const UploadImage: React.FC = () => {
                 method: 'POST',
                 body: formData,
             });
-
             const responseData = await response.json();
             setDebug([JSON.stringify(responseData, null, 2), debug[1]]);
         } catch (error) {
             console.error('Error uploading file:', error);
         }
+        reloadPage();
     };
 
     const onChangePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,10 +56,10 @@ export const UploadImage: React.FC = () => {
         <div>
             <h2>Upload Image</h2>
             <h3>Preview</h3>
-            <img src={imgData as string} alt="Preview" />
-            <br />
-            <input type="file" onChange={onChangePicture} />
-            <input type="submit" value="Upload" onClick={onUpload} />
+            <img src={imgData as string} alt="Preview"/>
+            <br/>
+            <input type="file" onChange={onChangePicture}/>
+            <input type="submit" value="Upload" onClick={onUpload}/>
 
             <h3>Debug</h3>
             <p>{'picture: ' + debug[0]}</p>

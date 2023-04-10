@@ -1,5 +1,6 @@
 import React from "react";
 import {ApiData} from "../interfaces";
+import reloadPage from "../util/ReloadPage";
 
 
 interface Props {
@@ -15,7 +16,7 @@ const RemoveImage = (ImageName: string) => {
             await fetch(url, {
                 method: 'DELETE'
             });
-            alert("Image removed: " + ImageName)
+            reloadPage();
         } catch (error) {
             console.error('Error uploading file:', error);
         }
