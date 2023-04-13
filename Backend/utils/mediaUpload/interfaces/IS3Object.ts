@@ -34,4 +34,11 @@ export interface IS3Object {
      * @constructor
      */
     get FileName(): string
+
+    toJSON(): IS3ObjectJSON;
+}
+
+export interface IS3ObjectJSON {
+    FileLink: string | undefined,
+    Metadata: [string, string][],
 }

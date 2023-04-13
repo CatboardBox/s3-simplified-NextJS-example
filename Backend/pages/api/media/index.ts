@@ -1,12 +1,12 @@
 import {NextApiRequest, NextApiResponse} from 'next'
-import {S3Lib} from 'utils/mediaUpload/classes/s3lib'
-import process from "process";
+import {S3Lib} from '../../../utils/mediaUpload'
+
 
 
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
-    const lib = new S3Lib("ap-southeast-1", process.env.AccessKey, process.env.SecretAccessKey);
+    console.log('Request received')
     try {
-        const imagesBucket = await lib.getOrCreateBucket("imagebuckettesting");
+        const imagesBucket = await S3Lib.Default.getOrCreateBucket("imagebuckettesting");
         const images = await imagesBucket.listObjectsUrls();
         if (!Array.isArray(images)) {
             res.status(500).json({statusCode: 500, message: "Cannot find image data"});

@@ -9,8 +9,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const data = await parseFormData(req);
             const uploadedFile: File = data.files.file
 
-            const lib = new S3Lib("ap-southeast-1", process.env.AccessKey, process.env.SecretAccessKey);
-            const imagesBucket = await lib.getOrCreateBucket("imagebuckettesting");
+            const imagesBucket = await S3Lib.Default.getOrCreateBucket("imagebuckettesting");
             await imagesBucket.createObjectFromFile(uploadedFile);
 
             res.status(200).json({message: 'File uploaded successfully', data});

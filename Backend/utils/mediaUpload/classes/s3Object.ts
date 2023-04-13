@@ -3,12 +3,12 @@ import {Metadata} from "./Metadata";
 import {generateUUID} from "../utils/GenerateUUID";
 import fs from "fs";
 import {File} from 'formidable';
-import {IMetadata, IS3Object} from "../interfaces";
+import {IMetadata, IS3Object, IS3ObjectJSON} from "../interfaces";
 
 type AcceptedDataTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
 
 export class S3Object implements IS3Object {
-    constructor(private data: AcceptedDataTypes, private metadata: Metadata = new Metadata()) {
+    constructor(private data: AcceptedDataTypes, private metadata: Metadata = new Metadata(), private link?: string) {
         if (this.Name === undefined) this.Name = generateUUID();
     }
 
@@ -18,6 +18,30 @@ export class S3Object implements IS3Object {
 
     public get Metadata(): IMetadata {
         return this.metadata;
+    }
+
+    public get Link(): string | undefined {
+        return this.link;
+    }
+
+    /**
+     * @internal for internal use only
+     * @param value
+     */
+    public set Link(value: string | undefined) {
+        this.link = value;
+    }
+
+    public toJSON(): IS3ObjectJSON {
+        // console.log("toJSON");
+        // console.log(JSON.stringify({
+        //     FileLink: this.link,
+        //     Metadata: this.Metadata.toRecord(),
+        // }));
+        return {
+            FileLink: this.link,
+            Metadata: this.Metadata.Pairs,
+        };
     }
 
     public get DataSize(): number | undefined {
@@ -56,7 +80,6 @@ export class S3Object implements IS3Object {
     public get FileName(): string {
         return this.Name + "." + this.Extension;
     }
-
 
     public static async fromFile(file: File): Promise<S3Object> {
         return new Promise<S3Object>((resolve, _) => {

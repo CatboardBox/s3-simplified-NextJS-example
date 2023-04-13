@@ -36,7 +36,6 @@ export class S3Bucket implements IS3Bucket {
     public async createObject(s3Object: S3Object): Promise<void> {
         const size = s3Object.DataSize;
         if (size === undefined) throw new Error("Data size is undefined");
-
         const command = (size <= config.multipartUploadThreshold) ?
             new PutObjectCommand({
                 Bucket: this.bucketName,
@@ -55,13 +54,15 @@ export class S3Bucket implements IS3Bucket {
     public async createObjectFromFile(file: File): Promise<IS3Object> {
         const s3Object = await S3Object.fromFile(file);
         await this.createObject(s3Object);
+        s3Object.Link = this.getPublicUrlInternal(s3Object.FileName);
         return s3Object;
     }
 
     public async getObject(key: string): Promise<IS3Object> {
         const command = new GetObjectCommand({Bucket: this.bucketName, Key: key});
         const response = await this.s3.send(command);
-        return new S3Object(response.Body as Readable, new Metadata(response.Metadata));
+        console.log(response.Metadata);
+        return new S3Object(response.Body as Readable, new Metadata(response.Metadata), this.getPublicUrlInternal(key));
     }
 
     public async deleteObject(key: string): Promise<void> {

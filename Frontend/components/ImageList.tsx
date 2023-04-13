@@ -7,9 +7,8 @@ interface Props {
     data: ApiData[];
 }
 
-const RemoveImage = (ImageName: string) => {
-    const id = ImageName.split('/').pop();
-    const url = 'http://localhost:3000/api/media/delete?id=' + id;
+const RemoveImage = (ImageId: string) => {
+    const url = 'http://localhost:3000/api/media/delete?id=' + ImageId;
     return async (e: React.MouseEvent<HTMLInputElement>) => {
         e.preventDefault();
         try {
@@ -23,6 +22,7 @@ const RemoveImage = (ImageName: string) => {
     }
 }
 
+const ImageLink = (ImageId: string) => () => window.location.pathname = '/image/' + ImageId;
 
 export const ImageList: React.FC<Props> = ({data}) => {
     const acceptedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'];
@@ -35,9 +35,10 @@ export const ImageList: React.FC<Props> = ({data}) => {
             <h2>Images</h2>
             {
                 filteredData.map((item: string) => {
+                    const id = item.split('/').pop();
                     return <>
-                        <img src={item} alt={item} key={item}/>
-                        <button onClick={RemoveImage(item)}>Remove</button>
+                        <img src={item} alt={item} key={item} onClick={ImageLink(id)}/>
+                        <button onClick={RemoveImage(id)}>Remove</button>
                     </>;
                 })
             }

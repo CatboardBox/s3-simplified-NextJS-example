@@ -53,7 +53,12 @@ export class Metadata implements IMetadata {
     }
 
     public toRecord(): Record<string, string> {
-        return {...this.metadata};
+        const record: Record<string, string> = {};
+        for (const key in this.metadata) {
+            if (!Object.prototype.hasOwnProperty.call(this.metadata, key)) continue;
+            record[key] = String(this.metadata[key]);
+        }
+        return record;
     }
 
     public asRecord(): Record<string, string> {

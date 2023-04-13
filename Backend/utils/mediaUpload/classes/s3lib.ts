@@ -4,12 +4,13 @@ import BucketNameValidator from "../utils/validators/BucketNameValidator";
 import {IS3Bucket, S3Interface} from "../interfaces";
 import {Regions} from "../types";
 import {InvalidBucketName, MissingBucket} from "./Errors";
+import config from "../config";
 
 export class S3Lib implements S3Interface {
     private readonly s3: S3;
     private readonly getBucketUrlInternal: (bucketName: string) => string;
 
-    constructor(region: Regions, accessKeyId: string, secretAccessKey: string) {
+    constructor(region: Regions = config.region, accessKeyId: string = config.accessKeyId, secretAccessKey: string = config.secretAccessKey) {
         this.s3 = new S3({region, credentials: {accessKeyId, secretAccessKey}});
         this.getBucketUrlInternal = (bucketName: string) => `https://${bucketName}.s3.${region}.amazonaws.com`;
     }
@@ -63,5 +64,7 @@ export class S3Lib implements S3Interface {
     private getBucketInternal(bucketName: string): S3Bucket {
         return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
     }
+
+    public static readonly Default = new S3Lib();
 }
 
