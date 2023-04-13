@@ -1,6 +1,8 @@
 import {CreateBucketCommand, DeleteBucketCommand, HeadBucketCommand, ListBucketsCommand, S3} from "@aws-sdk/client-s3";
 import {S3Bucket} from "./s3Bucket";
-import BucketNameValidator from "../validators/BucketNameValidator";
+import BucketNameValidator from "../utils/validators/BucketNameValidator";
+import {IS3Bucket} from "../interfaces/IS3Bucket";
+import {Regions} from "../types/regions";
 
 export class S3Lib {
     private readonly s3: S3;
@@ -13,13 +15,13 @@ export class S3Lib {
         }
     }
 
-    public async createBucket(bucketName: string): Promise<S3Bucket> {
+    public async createBucket(bucketName: string): Promise<IS3Bucket> {
         console.log("Creating bucket: " + bucketName);
         const nameValid = await BucketNameValidator.validateAsync(bucketName)
         if (!nameValid) return Promise.reject(new Error("Invalid bucket name: " + bucketName));
         const command = new CreateBucketCommand({Bucket: bucketName});
         await this.s3.send(command);
-        return new S3Bucket(this.s3,this.getBucketUrl(bucketName), bucketName);
+        return new S3Bucket(this.s3, this.getBucketUrl(bucketName), bucketName);
     }
 
     public async deleteBucket(bucketName: string): Promise<void> {
@@ -40,22 +42,20 @@ export class S3Lib {
      * @param bucketName the name of the bucket
      * @returns an S3Bucket object for the given bucket name
      */
-    public async getBucket(bucketName: string): Promise<S3Bucket> {
-        if (await this.containsBucket(bucketName)) {
-            return this.getBucketNoChecks(bucketName);
-        }
+    public async getBucket(bucketName: string): Promise<IS3Bucket> {
+        if (!await this.containsBucket(bucketName))
+            throw new Error("Bucket does not exist: " + bucketName);
+        return this.getBucketInternal(bucketName);
+
     }
 
-    public async getOrCreateBucket(bucketName: string): Promise<S3Bucket> {
-        if (await this.containsBucket(bucketName)) {
-            console.log("Get or creating bucket: " + bucketName + " (Get)")
-            return this.getBucketNoChecks(bucketName);
-        }
-        console.log("Get or creating bucket: " + bucketName + " (Create)")
+    public async getOrCreateBucket(bucketName: string): Promise<IS3Bucket> {
+        if (await this.containsBucket(bucketName))
+            return this.getBucketInternal(bucketName);
         return this.createBucket(bucketName);
     }
 
-    private getBucketNoChecks(bucketName: string): S3Bucket {
+    private getBucketInternal(bucketName: string): S3Bucket {
         return new S3Bucket(this.s3, this.getBucketUrl(bucketName), bucketName);
     }
 
@@ -71,32 +71,3 @@ export class S3Lib {
     }
 }
 
-//https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html#concepts-regions
-type Regions =
-    "us-east-2" |
-    "us-east-1" |
-    "us-west-1" |
-    "us-west-2" |
-    "af-south-1" |
-    "ap-east-1" |
-    "ap-south-2" |
-    "ap-southeast-3" |
-    "ap-southeast-4" |
-    "ap-south-1" |
-    "ap-northeast-3" |
-    "ap-northeast-2" |
-    "ap-southeast-1" |
-    "ap-southeast-2" |
-    "ap-northeast-1" |
-    "ca-central-1" |
-    "eu-central-1" |
-    "eu-west-1" |
-    "eu-west-2" |
-    "eu-south-1" |
-    "eu-west-3" |
-    "eu-south-2" |
-    "eu-north-1" |
-    "eu-central-2" |
-    "me-south-1" |
-    "me-central-1" |
-    "sa-east-1"

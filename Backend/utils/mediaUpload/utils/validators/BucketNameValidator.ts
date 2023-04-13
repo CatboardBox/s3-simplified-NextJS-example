@@ -1,4 +1,4 @@
-import {DynamicValidator, ImmutableValidator} from "../utils/Validator";
+import {DynamicValidator, ImmutableValidator} from "../Validator";
 
 class BucketNameValidator {
 

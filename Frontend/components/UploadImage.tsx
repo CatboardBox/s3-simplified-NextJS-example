@@ -7,13 +7,13 @@ const uploadUrl = 'http://localhost:3000/api/media/upload';
 export const UploadImage: React.FC = () => {
     const [picture, setPicture] = useState<File | null>(null);
     const [imgData, setImgData] = useState<string | ArrayBuffer | null>(null);
-    const [debug, setDebug] = useState(['empty', 'empty']);
+    const [debug, setDebug] = useState<Record<string, string>>({});
 
     const onUpload = async (e: React.MouseEvent<HTMLInputElement>) => {
         e.preventDefault();
-        const debugData = [];
-        debugData[0] = JSON.stringify(picture);
-        debugData[1] = JSON.stringify(imgData);
+        const debugData = {};
+        debugData["picture"] = JSON.stringify(picture);
+        debugData["imgData"] = JSON.stringify(imgData);
         setDebug(debugData);
 
         if (picture === null) return;
@@ -28,7 +28,8 @@ export const UploadImage: React.FC = () => {
                 body: formData,
             });
             const responseData = await response.json();
-            setDebug([JSON.stringify(responseData, null, 2), debug[1]]);
+            debugData["response"] = JSON.stringify(responseData);
+            setDebug(debugData);
         } catch (error) {
             console.error('Error uploading file:', error);
         }
@@ -62,8 +63,12 @@ export const UploadImage: React.FC = () => {
             <input type="submit" value="Upload" onClick={onUpload}/>
 
             <h3>Debug</h3>
-            <p>{'picture: ' + debug[0]}</p>
-            <p>{'imgData: ' + debug[1]}</p>
+            {
+                Object.keys(debug).map((key) => {
+                    return <p key={key}>{key}: {debug[key]}
+                    </p>;
+                })
+            }
         </div>
     );
 };

@@ -3,18 +3,19 @@ import {
     GetObjectCommand,
     HeadObjectCommand,
     ListObjectsV2Command,
-    PutBucketPolicyCommand,
     PutObjectCommand,
     S3
 } from "@aws-sdk/client-s3";
 import {Readable} from "stream";
 import {S3Object} from "./s3Object";
 import {Metadata} from "./metadata";
+import {IS3Object} from "../interfaces/IS3Object";
+import {IS3Bucket} from "../interfaces/IS3Bucket";
 
-export class S3Bucket {
+export class S3Bucket implements IS3Bucket{
     private s3: S3;
     private readonly bucketName: string;
-    private readonly getPublicUrlNoCheck: (key: string) => string;
+    private readonly getPublicUrlInternal: (key: string) => string;
 
     /**
      * @internal
@@ -25,7 +26,7 @@ export class S3Bucket {
     constructor(s3: S3, stringUrl: string, bucketName: string) {
         this.s3 = s3;
         this.bucketName = bucketName;
-        this.getPublicUrlNoCheck = (key: string) => {
+        this.getPublicUrlInternal = (key: string) => {
             return `${stringUrl}/${key}`;
         }
     }
@@ -34,13 +35,19 @@ export class S3Bucket {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
             Key: s3Object.FileName,
-            Body: s3Object.data,
-            Metadata: s3Object.metadata.asRecord()
+            Body: s3Object.Body,
+            Metadata: s3Object.Metadata.toRecord()
         });
         await this.s3.send(command);
     }
 
-    async getObject(key: string): Promise<S3Object> {
+    async createObjectFromFile(file: File): Promise<IS3Object> {
+        const s3Object = await S3Object.fromFile(file);
+        await this.createObject(s3Object);
+        return s3Object;
+    }
+
+    async getObject(key: string): Promise<IS3Object> {
         const command = new GetObjectCommand({Bucket: this.bucketName, Key: key});
         const response = await this.s3.send(command);
         return new S3Object(response.Body as Readable, new Metadata(response.Metadata));
@@ -63,39 +70,12 @@ export class S3Bucket {
 
     async listObjectsUrls(): Promise<Array<string>> {
         const objects = await this.listObjects();
-        return objects.map(object => this.getPublicUrlNoCheck(object));
+        return objects.map(object => this.getPublicUrlInternal(object));
     }
 
     //todo
     async changeAccessPolicy(): Promise<void> {
         throw new Error("Not implemented");
-    }
-
-    /**
-     * Makes the bucket public by setting the bucket policy to allow public read access.
-     * @deprecated this is for testing only
-     */
-    //todo remove this
-    async makeBucketPublic(): Promise<void> {
-        const publicReadPolicy = {
-            Version: "2012-10-17",
-            Statement: [
-                {
-                    Sid: "PublicRead",
-                    Effect: "Allow",
-                    Principal: "*",
-                    Action: "s3:GetObject",
-                    Resource: `arn:aws:s3:::${this.bucketName}/*`,
-                },
-            ],
-        };
-
-        const command = new PutBucketPolicyCommand({
-            Bucket: this.bucketName,
-            Policy: JSON.stringify(publicReadPolicy),
-        });
-
-        await this.s3.send(command);
     }
 
     async containsObject(key: string): Promise<boolean> {
@@ -115,6 +95,6 @@ export class S3Bucket {
         if (!await this.containsObject(key))
             throw new Error(`Object with key ${key} does not exist in bucket ${this.bucketName}`);
 
-        return this.getPublicUrlNoCheck(key);
+        return this.getPublicUrlInternal(key);
     }
 }

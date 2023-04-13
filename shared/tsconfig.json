@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "rootDir": ".",
+    "outDir": "../node_modules/@shared"
+  },
+  "include": ["./**/*"]
+}

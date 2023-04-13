@@ -1,62 +1,64 @@
-export class Metadata {
-    constructor(private metadata: { [key: string]: string } = {}) {
+import {IMetadata} from "../interfaces/IMetadata";
+
+export class Metadata implements IMetadata {
+    constructor(private metadata: Record<string, string> = {}) {
     }
 
-    public getMetadata(key: string): string | undefined {
+    public get(key: string): string | undefined {
         return this.metadata[key];
     }
 
-    public setMetadata(key: string, value: string): void {
+    public set(key: string, value: string): void {
         this.metadata[key] = value;
     }
 
-    public getMetadataKeys(): string[] {
+    public get Keys(): string[] {
         return Object.keys(this.metadata);
     }
 
-    public getMetadataValues(): string[] {
+    public get Values(): string[] {
         return Object.values(this.metadata);
     }
 
-    public getMetadataEntries(): [string, string][] {
+    public get Pairs(): [string, string][] {
         return Object.entries(this.metadata);
     }
 
-    public getMetadataSize(): number {
-        return this.getMetadataKeys().length;
+    public Length(): number {
+        return this.Keys.length;
     }
 
-    public hasMetadata(): boolean {
-        return this.getMetadataSize() > 0;
+    public isEmpty(): boolean {
+        return this.Length() === 0;
     }
 
-    public hasMetadataKey(key: string): boolean {
-        return this.getMetadataKeys().includes(key);
+    public containsKey(key: string): boolean {
+        return this.Keys.includes(key);
     }
 
-    public hasMetadataValue(value: string): boolean {
-        return this.getMetadataValues().includes(value);
+    public containsValue(value: string): boolean {
+        return this.Values.includes(value);
     }
 
-    public hasMetadataEntry(entry: [string, string]): boolean {
-        return this.getMetadataEntries().includes(entry);
+    public contains(entry: [string, string]): boolean {
+        return this.Pairs.includes(entry);
     }
 
-    public deleteMetadata(key: string): void {
+    public delete(key: string): void {
         delete this.metadata[key];
     }
 
-    public deleteAllMetadata(): void {
+    public clear(): void {
         this.metadata = {};
     }
 
+    public toRecord(): Record<string, string> {
+        return {...this.metadata};
+    }
+
     public asRecord(): Record<string, string> {
-        const record: Record<string, string> = {};
-        for (const key in this) {
-            if (!Object.prototype.hasOwnProperty.call(this, key)) continue;
-            record[key] = String(this[key]);
-        }
-        return record;
+        return this.metadata;
     }
 }
+
 
