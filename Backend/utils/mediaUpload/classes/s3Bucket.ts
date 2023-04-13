@@ -1,4 +1,5 @@
 import {
+    CreateMultipartUploadCommand,
     DeleteObjectCommand,
     GetObjectCommand,
     HeadObjectCommand,
@@ -11,8 +12,9 @@ import {S3Object} from "./s3Object";
 import {Metadata} from "./metadata";
 import {IS3Object} from "../interfaces/IS3Object";
 import {IS3Bucket} from "../interfaces/IS3Bucket";
+import config from "../config";
 
-export class S3Bucket implements IS3Bucket{
+export class S3Bucket implements IS3Bucket {
     private s3: S3;
     private readonly bucketName: string;
     private readonly getPublicUrlInternal: (key: string) => string;
@@ -32,12 +34,21 @@ export class S3Bucket implements IS3Bucket{
     }
 
     async createObject(s3Object: S3Object): Promise<void> {
-        const command = new PutObjectCommand({
-            Bucket: this.bucketName,
-            Key: s3Object.FileName,
-            Body: s3Object.Body,
-            Metadata: s3Object.Metadata.toRecord()
-        });
+        const size = s3Object.DataSize;
+        if (size === undefined) throw new Error("Data size is undefined");
+
+        const command = (size <= config.multipartUploadThreshold) ?
+            new PutObjectCommand({
+                Bucket: this.bucketName,
+                Key: s3Object.FileName,
+                Body: s3Object.Body,
+                Metadata: s3Object.Metadata.toRecord()
+            }) :
+            new CreateMultipartUploadCommand({
+                Bucket: this.bucketName,
+                Key: s3Object.FileName,
+                Metadata: s3Object.Metadata.toRecord()
+            });
         await this.s3.send(command);
     }
 
@@ -61,11 +72,9 @@ export class S3Bucket implements IS3Bucket{
     async listObjects(): Promise<Array<string>> {
         const command = new ListObjectsV2Command({Bucket: this.bucketName});
         const response = await this.s3.send(command);
-        return response.Contents ?
-            // if response.Contents is not null, then map the array to get the keys
-            response.Contents.map(content => content.Key || "[unknown]")
-            // if response.Contents is null, then return an empty array
-            : [];
+        // if response.Contents is not null, then map the array to get the keys
+        // else return an empty array
+        return response.Contents ? response.Contents.map(content => content.Key || "[unknown]") : [];
     }
 
     async listObjectsUrls(): Promise<Array<string>> {
@@ -91,10 +100,8 @@ export class S3Bucket implements IS3Bucket{
 
 
     async getPublicUrl(key: string): Promise<string> {
-        //check if key exists
         if (!await this.containsObject(key))
             throw new Error(`Object with key ${key} does not exist in bucket ${this.bucketName}`);
-
         return this.getPublicUrlInternal(key);
     }
 }

@@ -6,13 +6,15 @@ import {Regions} from "../types/regions";
 
 export class S3Lib {
     private readonly s3: S3;
-    private readonly getBucketUrl: (bucketName: string) => string;
+    private readonly getBucketUrlInternal: (bucketName: string) => string;
 
     constructor(region: Regions, accessKeyId: string, secretAccessKey: string) {
         this.s3 = new S3({region, credentials: {accessKeyId, secretAccessKey}});
-        this.getBucketUrl = (bucketName: string) => {
-            return `https://${bucketName}.s3.${region}.amazonaws.com`;
-        }
+        this.getBucketUrlInternal = (bucketName: string) => `https://${bucketName}.s3.${region}.amazonaws.com`;
+    }
+
+    private getBucketInternal(bucketName: string): S3Bucket {
+        return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
     }
 
     public async createBucket(bucketName: string): Promise<IS3Bucket> {
@@ -21,7 +23,7 @@ export class S3Lib {
         if (!nameValid) return Promise.reject(new Error("Invalid bucket name: " + bucketName));
         const command = new CreateBucketCommand({Bucket: bucketName});
         await this.s3.send(command);
-        return new S3Bucket(this.s3, this.getBucketUrl(bucketName), bucketName);
+        return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
     }
 
     public async deleteBucket(bucketName: string): Promise<void> {
@@ -36,6 +38,7 @@ export class S3Lib {
             response.Buckets.map(bucket => bucket.Name || '[unknown]')
             : [];
     }
+
 
     /**
      * Returns an S3Bucket object for the given bucket name.
@@ -55,11 +58,7 @@ export class S3Lib {
         return this.createBucket(bucketName);
     }
 
-    private getBucketInternal(bucketName: string): S3Bucket {
-        return new S3Bucket(this.s3, this.getBucketUrl(bucketName), bucketName);
-    }
-
-    async containsBucket(bucketName: string): Promise<boolean> {
+    public async containsBucket(bucketName: string): Promise<boolean> {
         try {
             const command = new HeadBucketCommand({Bucket: bucketName});
             await this.s3.send(command);
