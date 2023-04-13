@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {S3Lib} from "../../../../utils/mediaUpload/classes/s3lib";
+import {S3Lib} from "../../../../utils/mediaUpload";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log('Request received')

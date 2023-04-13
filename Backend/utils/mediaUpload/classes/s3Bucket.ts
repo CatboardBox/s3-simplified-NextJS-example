@@ -9,10 +9,10 @@ import {
 } from "@aws-sdk/client-s3";
 import {Readable} from "stream";
 import {S3Object} from "./s3Object";
-import {Metadata} from "./metadata";
-import {IS3Object} from "../interfaces/IS3Object";
-import {IS3Bucket} from "../interfaces/IS3Bucket";
+import {Metadata} from "./Metadata";
+import {IS3Bucket, IS3Object} from "../interfaces";
 import config from "../config";
+import {MissingObject} from "./Errors";
 
 export class S3Bucket implements IS3Bucket {
     private s3: S3;
@@ -33,7 +33,7 @@ export class S3Bucket implements IS3Bucket {
         }
     }
 
-    async createObject(s3Object: S3Object): Promise<void> {
+    public async createObject(s3Object: S3Object): Promise<void> {
         const size = s3Object.DataSize;
         if (size === undefined) throw new Error("Data size is undefined");
 
@@ -52,24 +52,24 @@ export class S3Bucket implements IS3Bucket {
         await this.s3.send(command);
     }
 
-    async createObjectFromFile(file: File): Promise<IS3Object> {
+    public async createObjectFromFile(file: File): Promise<IS3Object> {
         const s3Object = await S3Object.fromFile(file);
         await this.createObject(s3Object);
         return s3Object;
     }
 
-    async getObject(key: string): Promise<IS3Object> {
+    public async getObject(key: string): Promise<IS3Object> {
         const command = new GetObjectCommand({Bucket: this.bucketName, Key: key});
         const response = await this.s3.send(command);
         return new S3Object(response.Body as Readable, new Metadata(response.Metadata));
     }
 
-    async deleteObject(key: string): Promise<void> {
+    public async deleteObject(key: string): Promise<void> {
         const command = new DeleteObjectCommand({Bucket: this.bucketName, Key: key});
         await this.s3.send(command);
     }
 
-    async listObjects(): Promise<Array<string>> {
+    public async listObjects(): Promise<Array<string>> {
         const command = new ListObjectsV2Command({Bucket: this.bucketName});
         const response = await this.s3.send(command);
         // if response.Contents is not null, then map the array to get the keys
@@ -77,17 +77,17 @@ export class S3Bucket implements IS3Bucket {
         return response.Contents ? response.Contents.map(content => content.Key || "[unknown]") : [];
     }
 
-    async listObjectsUrls(): Promise<Array<string>> {
+    public async listObjectsUrls(): Promise<Array<string>> {
         const objects = await this.listObjects();
         return objects.map(object => this.getPublicUrlInternal(object));
     }
 
     //todo
-    async changeAccessPolicy(): Promise<void> {
+    public async changeAccessPolicy(): Promise<void> {
         throw new Error("Not implemented");
     }
 
-    async containsObject(key: string): Promise<boolean> {
+    public async containsObject(key: string): Promise<boolean> {
         try {
             const command = new HeadObjectCommand({Bucket: this.bucketName, Key: key});
             await this.s3.send(command);
@@ -98,10 +98,9 @@ export class S3Bucket implements IS3Bucket {
         }
     }
 
-
-    async getPublicUrl(key: string): Promise<string> {
+    public async getPublicUrl(key: string): Promise<string> {
         if (!await this.containsObject(key))
-            throw new Error(`Object with key ${key} does not exist in bucket ${this.bucketName}`);
+            throw new MissingObject(key, this.bucketName);
         return this.getPublicUrlInternal(key);
     }
 }

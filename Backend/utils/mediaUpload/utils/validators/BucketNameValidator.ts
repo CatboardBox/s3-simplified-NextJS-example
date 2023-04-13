@@ -1,3 +1,5 @@
+// noinspection GrazieInspection
+
 import {DynamicValidator, ImmutableValidator} from "../Validator";
 
 class BucketNameValidator {
@@ -7,7 +9,7 @@ class BucketNameValidator {
     //Naming rules
     // https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
     public static createBucketNameValidator(): DynamicValidator<string> {
-        //Define Rules (rules below have more restrictions than the ones listed in the link above e.g. periods are allowed but not recommended for optimal performance so they're simply not allowed here)
+        //Define Rules (rules below have more restrictions than the ones listed in the link above e.g. periods are allowed but not recommended for optimal performance, so they're simply not allowed here)
         // must be between 3 and 63 characters long
         const between3and63 = (value: string) => value.length >= 3 && value.length <= 63;
         // must start with a letter or number

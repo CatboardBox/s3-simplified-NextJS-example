@@ -1,7 +1,7 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {File} from 'formidable';
-import {S3Lib} from "../../../../utils/mediaUpload/classes/s3lib";
-import {parseFormData} from "../../../../utils/mediaUpload/utils/parseFormData";
+import {S3Lib} from "../../../../utils/mediaUpload";
+import {parseFormData} from "../../../../utils/parseFormData";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {

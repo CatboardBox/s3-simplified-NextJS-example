@@ -1,10 +1,11 @@
 import {CreateBucketCommand, DeleteBucketCommand, HeadBucketCommand, ListBucketsCommand, S3} from "@aws-sdk/client-s3";
 import {S3Bucket} from "./s3Bucket";
 import BucketNameValidator from "../utils/validators/BucketNameValidator";
-import {IS3Bucket} from "../interfaces/IS3Bucket";
-import {Regions} from "../types/regions";
+import {IS3Bucket, S3Interface} from "../interfaces";
+import {Regions} from "../types";
+import {InvalidBucketName, MissingBucket} from "./Errors";
 
-export class S3Lib {
+export class S3Lib implements S3Interface {
     private readonly s3: S3;
     private readonly getBucketUrlInternal: (bucketName: string) => string;
 
@@ -13,14 +14,10 @@ export class S3Lib {
         this.getBucketUrlInternal = (bucketName: string) => `https://${bucketName}.s3.${region}.amazonaws.com`;
     }
 
-    private getBucketInternal(bucketName: string): S3Bucket {
-        return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
-    }
-
     public async createBucket(bucketName: string): Promise<IS3Bucket> {
         console.log("Creating bucket: " + bucketName);
         const nameValid = await BucketNameValidator.validateAsync(bucketName)
-        if (!nameValid) return Promise.reject(new Error("Invalid bucket name: " + bucketName));
+        if (!nameValid) return Promise.reject(new InvalidBucketName(bucketName));
         const command = new CreateBucketCommand({Bucket: bucketName});
         await this.s3.send(command);
         return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
@@ -39,15 +36,9 @@ export class S3Lib {
             : [];
     }
 
-
-    /**
-     * Returns an S3Bucket object for the given bucket name.
-     * @param bucketName the name of the bucket
-     * @returns an S3Bucket object for the given bucket name
-     */
     public async getBucket(bucketName: string): Promise<IS3Bucket> {
         if (!await this.containsBucket(bucketName))
-            throw new Error("Bucket does not exist: " + bucketName);
+            throw new MissingBucket(bucketName)
         return this.getBucketInternal(bucketName);
 
     }
@@ -67,6 +58,10 @@ export class S3Lib {
             if (error.name === undefined || error.name !== "NoSuchBucket") throw error;
             return false;
         }
+    }
+
+    private getBucketInternal(bucketName: string): S3Bucket {
+        return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
     }
 }
 

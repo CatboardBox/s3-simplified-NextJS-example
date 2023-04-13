@@ -2,6 +2,10 @@ import {IMetadata} from "./IMetadata";
 
 export interface IS3Object {
 
+    /**
+     * @returns a metadata object
+     * @constructor
+     */
     get Metadata(): IMetadata
 
     /**
@@ -14,6 +18,10 @@ export interface IS3Object {
      */
     get Type(): string | undefined
 
+    /**
+     * @returns the data file extension (e.g. "jpeg")
+     * @constructor
+     */
     get Extension(): string | undefined
 
     /**
@@ -21,5 +29,9 @@ export interface IS3Object {
      */
     get Name(): string
 
+    /**
+     * @returns the data file name with extension (e.g. "image.jpeg")
+     * @constructor
+     */
     get FileName(): string
 }

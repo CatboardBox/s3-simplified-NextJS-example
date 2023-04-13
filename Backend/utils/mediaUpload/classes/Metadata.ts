@@ -1,15 +1,7 @@
-import {IMetadata} from "../interfaces/IMetadata";
+import {IMetadata} from "../interfaces";
 
 export class Metadata implements IMetadata {
     constructor(private metadata: Record<string, string> = {}) {
-    }
-
-    public get(key: string): string | undefined {
-        return this.metadata[key];
-    }
-
-    public set(key: string, value: string): void {
-        this.metadata[key] = value;
     }
 
     public get Keys(): string[] {
@@ -22,6 +14,14 @@ export class Metadata implements IMetadata {
 
     public get Pairs(): [string, string][] {
         return Object.entries(this.metadata);
+    }
+
+    public get(key: string): string | undefined {
+        return this.metadata[key];
+    }
+
+    public set(key: string, value: string): void {
+        this.metadata[key] = value;
     }
 
     public Length(): number {

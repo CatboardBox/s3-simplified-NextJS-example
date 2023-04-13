@@ -9,7 +9,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
         const imagesBucket = await lib.getOrCreateBucket("imagebuckettesting");
         const images = await imagesBucket.listObjectsUrls();
         if (!Array.isArray(images)) {
-            throw new Error('Cannot find image data')
+            res.status(500).json({statusCode: 500, message: "Cannot find image data"});
         }
 
         res.status(200).json(images)

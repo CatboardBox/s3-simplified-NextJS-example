@@ -1,30 +1,31 @@
 import {Readable} from "stream";
-import {Metadata} from "./metadata";
+import {Metadata} from "./Metadata";
 import {generateUUID} from "../utils/GenerateUUID";
 import fs from "fs";
 import {File} from 'formidable';
-import {IS3Object} from "../interfaces/IS3Object";
-import {IMetadata} from "../interfaces/IMetadata";
+import {IMetadata, IS3Object} from "../interfaces";
 
-type AcceptedFileTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
+type AcceptedDataTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
 
 export class S3Object implements IS3Object {
-    constructor(private data: AcceptedFileTypes, private metadata: Metadata = new Metadata()) {
+    constructor(private data: AcceptedDataTypes, private metadata: Metadata = new Metadata()) {
         if (this.Name === undefined) this.Name = generateUUID();
     }
 
-    /**
-     * @returns the size of the data in bytes
-     */
+    public get Body(): AcceptedDataTypes {
+        return this.data;
+    }
+
+    public get Metadata(): IMetadata {
+        return this.metadata;
+    }
+
     public get DataSize(): number | undefined {
         const sizeStr = this.metadata.get("Content-Length");
         if (sizeStr === undefined) return undefined;
         return parseInt(sizeStr);
     }
 
-    /**
-     * @returns the data file type (e.g. "image/jpeg")
-     */
     public get Type(): string | undefined {
         return this.metadata.get("Content-Type");
     }
@@ -44,9 +45,6 @@ export class S3Object implements IS3Object {
         return split[1];
     }
 
-    /**
-     * @returns the data file name (e.g. "image")
-     */
     public get Name(): string {
         return this.metadata.get("Content-Disposition");
     }
@@ -59,11 +57,8 @@ export class S3Object implements IS3Object {
         return this.Name + "." + this.Extension;
     }
 
-    public get Body(): AcceptedFileTypes {
-        return this.data;
-    }
 
-    static async fromFile(file: File): Promise<S3Object> {
+    public static async fromFile(file: File): Promise<S3Object> {
         return new Promise<S3Object>((resolve, _) => {
             const metadata = new Metadata({
                 "Content-Type": file.mimetype,
@@ -76,9 +71,5 @@ export class S3Object implements IS3Object {
             const s3Object = new S3Object(buffer, metadata)
             return resolve(s3Object);
         });
-    }
-
-    get Metadata(): IMetadata {
-        return this.metadata;
     }
 }
