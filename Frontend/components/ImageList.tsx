@@ -1,6 +1,7 @@
 import React from "react";
 import {ApiData} from "../interfaces";
 import reloadPage from "../util/ReloadPage";
+import {acceptedExtensions} from "./AcceptedExtensions";
 
 
 interface Props {
@@ -25,7 +26,6 @@ const RemoveImage = (ImageId: string) => {
 const ImageLink = (ImageId: string) => () => window.location.pathname = '/image/' + ImageId;
 
 export const ImageList: React.FC<Props> = ({data}) => {
-    const acceptedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'];
     const filteredData = data.filter((item: string) => {
         const fileExtension = item.split('.').pop();
         return acceptedExtensions.includes(fileExtension);

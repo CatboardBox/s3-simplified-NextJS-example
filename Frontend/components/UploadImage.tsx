@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import reloadPage from "../util/ReloadPage";
+import {acceptedExtensions} from "./AcceptedExtensions";
 
-const acceptedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'];
 const uploadUrl = 'http://localhost:3000/api/media/upload';
 
 export const UploadImage: React.FC = () => {

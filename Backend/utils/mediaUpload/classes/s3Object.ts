@@ -81,6 +81,54 @@ export class S3Object implements IS3Object {
         return this.Name + "." + this.Extension;
     }
 
+    public async AsBuffer(): Promise<Buffer> {
+        const data = this.data;
+        if (Buffer.isBuffer(data)) return data;
+        if (data instanceof Uint8Array) return Buffer.from(data.buffer);
+        if (typeof data === 'string') return Buffer.from(data);
+        if (data instanceof Blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const buffer = Buffer.from(reader.result as ArrayBuffer);
+                    resolve(buffer);
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(data);
+            });
+        }
+        if (data instanceof Readable) {
+            return new Promise((resolve, reject) => {
+                const chunks: Uint8Array[] = [];
+                data.on('data', chunk => chunks.push(chunk));
+                data.on('end', () => resolve(Buffer.concat(chunks)));
+                data.on('error', reject);
+            });
+        }
+        // ReadableStream case
+        const reader = data.getReader();
+        const chunks: Uint8Array[] = [];
+
+        return new Promise(async (resolve, reject) => {
+            try {
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) {
+                        resolve(Buffer.concat(chunks));
+                        break;
+                    }
+                    if (value) {
+                        chunks.push(value);
+                    }
+                }
+            } catch (error) {
+                reject(error);
+            }
+        });
+
+    }
+
+
     public static async fromFile(file: File): Promise<S3Object> {
         return new Promise<S3Object>((resolve, _) => {
             const metadata = new Metadata({

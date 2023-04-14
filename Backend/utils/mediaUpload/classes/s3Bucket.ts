@@ -1,11 +1,15 @@
 import {
+    CompletedPart,
+    CompleteMultipartUploadCommand,
     CreateMultipartUploadCommand,
     DeleteObjectCommand,
     GetObjectCommand,
     HeadObjectCommand,
     ListObjectsV2Command,
     PutObjectCommand,
-    S3
+    S3,
+    UploadPartCommand,
+    UploadPartCommandOutput
 } from "@aws-sdk/client-s3";
 import {Readable} from "stream";
 import {S3Object} from "./s3Object";
@@ -36,19 +40,68 @@ export class S3Bucket implements IS3Bucket {
     public async createObject(s3Object: S3Object): Promise<void> {
         const size = s3Object.DataSize;
         if (size === undefined) throw new Error("Data size is undefined");
-        const command = (size <= config.multipartUploadThreshold) ?
-            new PutObjectCommand({
+
+        if (size <= config.multipartUploadThreshold) {
+            const command = new PutObjectCommand({
                 Bucket: this.bucketName,
                 Key: s3Object.FileName,
                 Body: s3Object.Body,
                 Metadata: s3Object.Metadata.toRecord()
-            }) :
-            new CreateMultipartUploadCommand({
+            });
+            await this.s3.send(command);
+            return Promise.resolve();
+        }
+
+        console.log("Using multipart upload")
+        const createMultipartUploadCommand = new CreateMultipartUploadCommand({
+            Bucket: this.bucketName,
+            Key: s3Object.FileName,
+            Metadata: s3Object.Metadata.toRecord()
+        });
+        const createMultipartUploadResponse = await this.s3.send(createMultipartUploadCommand);
+        const uploadId = createMultipartUploadResponse.UploadId;
+        if (!uploadId) throw new Error("Failed to initialize multipart upload");
+
+        const partSize = config.multipartChunkSize;
+        const partsCount = Math.ceil(size / partSize);
+
+        console.log(`Uploading ${partsCount} parts...`)
+        const promises = new Array<Promise<UploadPartCommandOutput>>(partsCount);
+        for (let i = 0; i < partsCount; i++) {
+            console.log(`Uploading part ${i + 1} of ${partsCount}`)
+            const start = i * partSize;
+            const end = Math.min(start + partSize, size);
+            const partBuffer = (await s3Object.AsBuffer()).slice(start, end);
+
+            const uploadPartCommand = new UploadPartCommand({
                 Bucket: this.bucketName,
                 Key: s3Object.FileName,
-                Metadata: s3Object.Metadata.toRecord()
+                UploadId: uploadId,
+                PartNumber: i + 1,
+                Body: partBuffer
             });
-        await this.s3.send(command);
+            promises[i] = this.s3.send(uploadPartCommand);
+        }
+        const uploadPartResponses = await Promise.all(promises);
+        const completedParts = uploadPartResponses.map((response, index) => {
+            return {
+                ETag: response.ETag,
+                PartNumber: index + 1
+            }
+        });
+        console.log("Completing multipart upload...")
+
+        const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
+            Bucket: this.bucketName,
+            Key: s3Object.FileName,
+            UploadId: uploadId,
+            MultipartUpload: {
+                Parts: completedParts
+            }
+        });
+        await this.s3.send(completeMultipartUploadCommand);
+        console.log("Multipart upload complete")
+        return Promise.resolve();
     }
 
     public async createObjectFromFile(file: File): Promise<IS3Object> {
