@@ -2,6 +2,7 @@ import {NextApiRequest, NextApiResponse} from 'next';
 import {File} from 'formidable';
 import {S3Lib} from "../../../../utils/mediaUpload";
 import {parseFormData} from "../../../../utils/parseFormData";
+import {currentBucket} from "../../../../utils/currentBucket";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
@@ -9,7 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const data = await parseFormData(req);
             const uploadedFile: File = data.files.file
 
-            const imagesBucket = await S3Lib.Default.getOrCreateBucket("imagebuckettesting");
+            const imagesBucket = await S3Lib.Default.getOrCreateBucket(currentBucket);
             await imagesBucket.createObjectFromFile(uploadedFile);
 
             res.status(200).json({message: 'File uploaded successfully', data});

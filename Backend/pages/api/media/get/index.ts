@@ -1,5 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {S3Lib} from "../../../../utils/mediaUpload";
+import {currentBucket} from "../../../../utils/currentBucket";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log('Request received')
@@ -27,7 +28,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         try {
 
-            const imagesBucket = await S3Lib.Default.getOrCreateBucket("imagebuckettesting");
+            const imagesBucket = await S3Lib.Default.getOrCreateBucket(currentBucket);
             const containsImage = imagesBucket.contains(id);
             if (!containsImage) {
                 res.status(400).json({message: 'Image does not exist'});

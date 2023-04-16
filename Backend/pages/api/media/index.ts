@@ -1,12 +1,13 @@
 import {NextApiRequest, NextApiResponse} from 'next'
 import {S3Lib} from '../../../utils/mediaUpload'
+import {currentBucket} from "../../../utils/currentBucket";
 
 
 
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     console.log('Request received')
     try {
-        const imagesBucket = await S3Lib.Default.getOrCreateBucket("imagebuckettesting");
+        const imagesBucket = await S3Lib.Default.getOrCreateBucket(currentBucket);
         const images = await imagesBucket.getAllObjects();
         const urls = await Promise.all(images.map(image => image.generateLink()))
         if (!Array.isArray(urls)) {

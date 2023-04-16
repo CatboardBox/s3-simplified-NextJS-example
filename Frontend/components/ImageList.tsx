@@ -9,7 +9,7 @@ interface Props {
 }
 
 const RemoveImage = (ImageId: string) => {
-    const url = 'http://localhost:3000/api/media/delete?id=' + ImageId;
+    const url = 'http://localhost:3000/api/media/delete?id=' + ImageId.split('?')[0];
     return async (e: React.MouseEvent<HTMLInputElement>) => {
         e.preventDefault();
         try {
@@ -23,11 +23,11 @@ const RemoveImage = (ImageId: string) => {
     }
 }
 
-const ImageLink = (ImageId: string) => () => window.location.pathname = '/image/' + ImageId;
+const ImageLink = (ImageId: string) => () => window.location.pathname = '/image/' + ImageId.split('?')[0];
 
 export const ImageList: React.FC<Props> = ({data}) => {
     const filteredData = data.filter((item: string) => {
-        const fileExtension = item.split('.').pop();
+        const fileExtension = item.split('.').pop().split('?')[0];
         return acceptedExtensions.includes(fileExtension);
     });
     return (

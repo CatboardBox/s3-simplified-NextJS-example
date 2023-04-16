@@ -92,6 +92,7 @@ export class S3BucketInternal {
     }
 
     public async generateSignedUrl(key: string): Promise<string> {
+        console.log("generating Signed Url");
         return getSignedUrl(this.s3, new GetObjectCommand({
             Bucket: this.bucketName,
             Key: key

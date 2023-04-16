@@ -20,7 +20,7 @@ export class S3Object implements IS3Object {
     }
 
     public async generateLink(): Promise<string> {
-        return await this.bucketSource.isPublic() ? this.bucketSource.generatePublicUrl(this.key) : this.bucketSource.generateSignedUrl(this.key);
+        return await this.bucketSource.isPublic() ? this.bucketSource.generatePublicUrl(this.key) : await this.bucketSource.generateSignedUrl(this.key);
     }
 
     public async toJSON(): Promise<IS3ObjectJSON> {
