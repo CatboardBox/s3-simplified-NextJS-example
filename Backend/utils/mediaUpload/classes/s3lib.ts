@@ -1,6 +1,5 @@
 import {CreateBucketCommand, DeleteBucketCommand, HeadBucketCommand, ListBucketsCommand, S3} from "@aws-sdk/client-s3";
 import {S3Bucket} from "./s3Bucket";
-import BucketNameValidator from "../utils/validators/BucketNameValidator";
 import {IS3Bucket, S3Interface} from "../interfaces";
 import {Regions} from "../types";
 import {InvalidBucketName, MissingBucket} from "./Errors";
@@ -17,8 +16,25 @@ export class S3Lib implements S3Interface {
 
     public async createBucket(bucketName: string): Promise<IS3Bucket> {
         console.log("Creating bucket: " + bucketName);
-        const nameValid = await BucketNameValidator.validateAsync(bucketName)
-        if (!nameValid) return Promise.reject(new InvalidBucketName(bucketName));
+        //Naming rules
+        // https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+
+        //Define Rules (rules below have more restrictions than the ones listed in the link above e.g. periods are allowed but not recommended for optimal performance, so they're simply not allowed here)
+        if (!(bucketName.length >= 3 && bucketName.length <= 63))
+            throw new InvalidBucketName(bucketName, `${bucketName} must be between 3 and 63 characters long`);
+        if (!(/^[a-z0-9]/.test(bucketName)))
+            throw new InvalidBucketName(bucketName, `${bucketName} must start with a letter or number`);
+        if (!(/[a-z0-9]$/.test(bucketName)))
+            throw new InvalidBucketName(bucketName, `${bucketName} must end with a letter or number`);
+        if (bucketName.includes('.') || bucketName.includes('_'))
+            throw new InvalidBucketName(bucketName, `${bucketName} must not contain "." or "_"`);
+        if (bucketName !== bucketName.toLowerCase())
+            throw new InvalidBucketName(bucketName, `${bucketName} must not contain any uppercase characters`);
+        if (bucketName.endsWith('-s3alias') || bucketName.endsWith('--ol-s3'))
+            throw new InvalidBucketName(bucketName, `${bucketName} must not end with be -s3alias or --ol-s3`);
+        if (bucketName.startsWith('xn--'))
+            throw new InvalidBucketName(bucketName, `${bucketName} must not start with be xn--`);
+
         const command = new CreateBucketCommand({Bucket: bucketName});
         await this.s3.send(command);
         return this.getBucketInternal(bucketName);

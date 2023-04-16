@@ -31,7 +31,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             // For example, if you're using a database, remove the record with the specified ID
             console.log(`Deleting data with ID: ${id}`);
             const imagesBucket = await S3Lib.Default.getOrCreateBucket("imagebuckettesting");
-            const containsImage = imagesBucket.containsObject(id);
+            const containsImage = imagesBucket.contains(id);
             if (!containsImage) {
                 res.status(400).json({message: 'Image does not exist'});
                 return;

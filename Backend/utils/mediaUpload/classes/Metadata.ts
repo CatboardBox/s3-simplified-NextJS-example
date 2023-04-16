@@ -17,11 +17,11 @@ export class Metadata implements IMetadata {
     }
 
     public get(key: string): string | undefined {
-        return this.metadata[key];
+        return this.metadata[key.toLowerCase()];
     }
 
     public set(key: string, value: string): void {
-        this.metadata[key] = value;
+        this.metadata[key.toLowerCase()] = value;
     }
 
     public Length(): number {
@@ -45,7 +45,7 @@ export class Metadata implements IMetadata {
     }
 
     public delete(key: string): void {
-        delete this.metadata[key];
+        delete this.metadata[key.toLowerCase()];
     }
 
     public clear(): void {
@@ -56,7 +56,7 @@ export class Metadata implements IMetadata {
         const record: Record<string, string> = {};
         for (const key in this.metadata) {
             if (!Object.prototype.hasOwnProperty.call(this.metadata, key)) continue;
-            record[key] = String(this.metadata[key]);
+            record[key.toLowerCase()] = String(this.metadata[key]);
         }
         return record;
     }

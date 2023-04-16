@@ -28,13 +28,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         try {
 
             const imagesBucket = await S3Lib.Default.getOrCreateBucket("imagebuckettesting");
-            const containsImage = imagesBucket.containsObject(id);
+            const containsImage = imagesBucket.contains(id);
             if (!containsImage) {
                 res.status(400).json({message: 'Image does not exist'});
                 return;
             }
 
-            if(await imagesBucket.containsObject(id) === false){
+            if(await imagesBucket.contains(id) === false){
                 res.status(400).json({message: 'Image does not exist'});
                 return;
             }
@@ -42,8 +42,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const object = await imagesBucket.getObject(id);
 
             console.log("object.toJSON()");
-            console.log(object.toJSON());
-            res.status(200).json(object.toJSON());
+            res.status(200).json(await object.toJSON());
         } catch (error) {
             console.error('Error getting data:', error);
             res.status(500).json({message: 'Error getting data'});
