@@ -1,5 +1,6 @@
 import {Regions} from "./types";
 import process from "process";
+import {B, KB, MB} from "./utils/Constants";
 
 type config = {
     multipartChunkSize: number;
@@ -10,8 +11,8 @@ type config = {
     secretAccessKey: string,
 }
 const config: config = {
-    multipartChunkSize: 1024 * 1024 * 5, // 5 MB
-    multipartUploadThreshold: 1024 * 1024 * 5, // 5 MB
+    multipartChunkSize: 5 * MB,
+    multipartUploadThreshold: 5 * MB,
     region: "ap-southeast-1",
 
     accessKeyId: process.env.accessKey,

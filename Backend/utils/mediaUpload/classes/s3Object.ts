@@ -4,6 +4,7 @@ import {generateUUID} from "../utils/GenerateUUID";
 import fs from "fs";
 import {File} from 'formidable';
 import {IMetadata, IS3Object, IS3ObjectJSON} from "../interfaces";
+import {FileTypeParser} from "../utils/FileTypeParser";
 
 type AcceptedDataTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
 
@@ -62,11 +63,10 @@ export class S3Object implements IS3Object {
         const ext = this.metadata.get("File-Type");
         if (ext) return ext;
         const type = this.Type;
-        if (type === undefined || !type.includes("/")) return undefined;
-        const split = type.split("/");
-        if (split.length !== 2) return undefined
-        this.metadata.set("File-Type", split[1]);
-        return split[1];
+        if (type === undefined) return undefined;
+        const fileType = FileTypeParser(type);
+        this.metadata.set("File-Type", fileType);
+        return fileType;
     }
 
     public get Name(): string {

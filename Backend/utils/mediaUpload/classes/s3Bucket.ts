@@ -1,6 +1,6 @@
 import {
     CompletedPart,
-    CompleteMultipartUploadCommand,
+    CompleteMultipartUploadCommand, CopyObjectCommand,
     CreateMultipartUploadCommand,
     DeleteObjectCommand,
     GetObjectCommand,
@@ -38,6 +38,8 @@ export class S3Bucket implements IS3Bucket {
     }
 
     public async createObject(s3Object: S3Object): Promise<void> {
+
+        console.log(s3Object.FileName);
         const size = s3Object.DataSize;
         if (size === undefined) throw new Error("Data size is undefined");
 
@@ -52,7 +54,10 @@ export class S3Bucket implements IS3Bucket {
             return Promise.resolve();
         }
 
+        // Multipart upload
         console.log("Using multipart upload")
+
+        console.log(s3Object.FileName);
         const createMultipartUploadCommand = new CreateMultipartUploadCommand({
             Bucket: this.bucketName,
             Key: s3Object.FileName,
@@ -66,6 +71,9 @@ export class S3Bucket implements IS3Bucket {
         const partsCount = Math.ceil(size / partSize);
 
         console.log(`Uploading ${partsCount} parts...`)
+
+        console.log(s3Object.FileName);
+        //Consolidate all the promises into one array and await them all at once rather than one by one
         const promises = new Array<Promise<UploadPartCommandOutput>>(partsCount);
         for (let i = 0; i < partsCount; i++) {
             console.log(`Uploading part ${i + 1} of ${partsCount}`)
@@ -91,6 +99,7 @@ export class S3Bucket implements IS3Bucket {
         });
         console.log("Completing multipart upload...")
 
+        console.log(s3Object.FileName);
         const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
             Bucket: this.bucketName,
             Key: s3Object.FileName,
@@ -100,7 +109,11 @@ export class S3Bucket implements IS3Bucket {
             }
         });
         await this.s3.send(completeMultipartUploadCommand);
-        console.log("Multipart upload complete")
+        console.log("Multipart upload complete");
+        console.log(s3Object.FileName);
+        console.log("Renaming file to original name...")
+        // End multipart upload
+        // Rename file to original name as it was renamed to a random name by the multipart upload
         return Promise.resolve();
     }
 
@@ -121,6 +134,23 @@ export class S3Bucket implements IS3Bucket {
     public async deleteObject(key: string): Promise<void> {
         const command = new DeleteObjectCommand({Bucket: this.bucketName, Key: key});
         await this.s3.send(command);
+    }
+
+    public async renameObject(oldKey: string, newKey: string): Promise<void> {
+        const copyCommand = new CopyObjectCommand({
+            Bucket: this.bucketName,
+            CopySource: `${this.bucketName}/${encodeURIComponent(oldKey)}`,
+            Key: newKey
+        });
+
+        await this.s3.send(copyCommand);
+
+        const deleteCommand = new DeleteObjectCommand({
+            Bucket: this.bucketName,
+            Key: oldKey
+        });
+
+        await this.s3.send(deleteCommand);
     }
 
     public async listObjects(): Promise<Array<string>> {
