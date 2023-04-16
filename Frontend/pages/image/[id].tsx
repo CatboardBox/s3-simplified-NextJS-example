@@ -28,6 +28,8 @@ const Page: React.FC<Props> = ({data, error}) => {
                                 </div>
                             ))
                         }
+                        <br/>
+                        Download Link: <a href={data.FileLink}>{data.FileLink}</a>
                     </div>
                 )
             }
