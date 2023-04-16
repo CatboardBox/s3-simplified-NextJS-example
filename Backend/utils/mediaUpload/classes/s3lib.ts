@@ -7,12 +7,12 @@ import {InvalidBucketName, MissingBucket} from "./Errors";
 import config from "../config";
 
 export class S3Lib implements S3Interface {
-    private readonly s3: S3;
-    private readonly getBucketUrlInternal: (bucketName: string) => string;
+    public readonly s3: S3;
+    public readonly region: Regions;
 
     constructor(region: Regions = config.region, accessKeyId: string = config.accessKeyId, secretAccessKey: string = config.secretAccessKey) {
         this.s3 = new S3({region, credentials: {accessKeyId, secretAccessKey}});
-        this.getBucketUrlInternal = (bucketName: string) => `https://${bucketName}.s3.${region}.amazonaws.com`;
+        this.region = region;
     }
 
     public async createBucket(bucketName: string): Promise<IS3Bucket> {
@@ -21,7 +21,7 @@ export class S3Lib implements S3Interface {
         if (!nameValid) return Promise.reject(new InvalidBucketName(bucketName));
         const command = new CreateBucketCommand({Bucket: bucketName});
         await this.s3.send(command);
-        return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
+        return this.getBucketInternal(bucketName);
     }
 
     public async deleteBucket(bucketName: string): Promise<void> {
@@ -62,9 +62,9 @@ export class S3Lib implements S3Interface {
     }
 
     private getBucketInternal(bucketName: string): S3Bucket {
-        return new S3Bucket(this.s3, this.getBucketUrlInternal(bucketName), bucketName);
+        return new S3Bucket(this, bucketName);
     }
 
-    public static readonly Default = new S3Lib();
+    public static readonly Default: S3Interface = new S3Lib();
 }
 

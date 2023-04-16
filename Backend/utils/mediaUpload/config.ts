@@ -1,6 +1,6 @@
 import {Regions} from "./types";
 import process from "process";
-import {B, KB, MB} from "./utils/Constants";
+import {MB, Minute} from "./utils/Constants";
 
 type config = {
     multipartChunkSize: number;
@@ -9,6 +9,9 @@ type config = {
 
     accessKeyId: string,
     secretAccessKey: string,
+
+    // noinspection SpellCheckingInspection
+    signedUrlExpiration: number,
 }
 const config: config = {
     multipartChunkSize: 5 * MB,
@@ -17,5 +20,7 @@ const config: config = {
 
     accessKeyId: process.env.accessKey,
     secretAccessKey: process.env.secretAccessKey,
+
+    signedUrlExpiration: 5 * Minute,
 }
 export default config

@@ -37,10 +37,10 @@ export interface IS3Bucket {
      */
     listObjectsUrls(): Promise<Array<string>>
 
-    /**
-     * @returns a promise that resolves when the bucket policy has been changed
-     */
-    changeAccessPolicy(): Promise<void>
+    // /**
+    //  * @returns a promise that resolves when the bucket policy has been changed
+    //  */
+    // changeAccessPolicy(): Promise<void>
 
     /**
      * @param key the key of the object
