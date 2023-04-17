@@ -1,3 +1,0 @@
-interface IS3Object {
-
-}
