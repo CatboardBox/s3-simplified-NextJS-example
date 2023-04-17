@@ -1,11 +1,12 @@
 import {CreateBucketCommand, DeleteBucketCommand, HeadBucketCommand, ListBucketsCommand, S3} from "@aws-sdk/client-s3";
-import {S3Bucket} from "./s3Bucket";
-import {IS3Bucket, S3Interface} from "../interfaces";
-import {Regions} from "../types";
-import {InvalidBucketName, MissingBucket} from "./Errors";
-import config from "../config";
+import {S3Bucket} from "../buckets/s3Bucket";
+import {IS3, IS3Bucket} from "../../interfaces";
+import {Regions} from "../../types";
+import {InvalidBucketName, MissingBucket} from "./errors";
+import config from "../../config";
 
-export class S3Lib implements S3Interface {
+export class S3Lib implements IS3 {
+    public static readonly Default: IS3 = new S3Lib();
     public readonly s3: S3;
     public readonly region: Regions;
 
@@ -80,7 +81,5 @@ export class S3Lib implements S3Interface {
     private getBucketInternal(bucketName: string): S3Bucket {
         return new S3Bucket(this, bucketName);
     }
-
-    public static readonly Default: S3Interface = new S3Lib();
 }
 

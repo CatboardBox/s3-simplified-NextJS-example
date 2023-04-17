@@ -1,5 +1,6 @@
 import {IMetadata} from "./IMetadata";
 import {Readable} from "stream";
+import {IS3ObjectJSON} from "./IS3ObjectJSON";
 
 export interface IS3Object {
 
@@ -38,12 +39,13 @@ export interface IS3Object {
      */
     get FileName(): string
 
+    /**
+     * @returns a promise that resolves to a link to the object
+     */
     generateLink(): Promise<string>;
 
+    /**
+     * @returns a promise that resolves to a JSON representation of the object
+     */
     toJSON(): Promise<IS3ObjectJSON>;
-}
-
-export interface IS3ObjectJSON {
-    FileLink: string | undefined,
-    Metadata: [string, string][],
 }

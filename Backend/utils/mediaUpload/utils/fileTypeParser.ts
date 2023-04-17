@@ -1,5 +1,5 @@
 // noinspection SpellCheckingInspection
-const Dictionary : Record<string, string> = {
+const Dictionary: Record<string, string> = {
     "x-msdownload": "exe",
     "x-shockwave-flash": "swf",
     "x-tar": "tar",

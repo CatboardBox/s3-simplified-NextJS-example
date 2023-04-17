@@ -24,6 +24,7 @@ export class MissingObject extends InvalidError {
         this.name = "InvalidObject";
     }
 }
+
 export class ExistingObject extends InvalidError {
     constructor(key: string, bucketName: string) {
         super();

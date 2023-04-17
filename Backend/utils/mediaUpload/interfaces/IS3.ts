@@ -1,6 +1,6 @@
 import {IS3Bucket} from "./IS3Bucket";
 
-export interface S3Interface {
+export interface IS3 {
 
     /**
      * Creates a new bucket with the given name.

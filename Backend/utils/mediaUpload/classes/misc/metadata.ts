@@ -1,4 +1,4 @@
-import {IMetadata} from "../interfaces";
+import {IMetadata} from "../../interfaces";
 
 export class Metadata implements IMetadata {
     constructor(private metadata: Record<string, string> = {}) {

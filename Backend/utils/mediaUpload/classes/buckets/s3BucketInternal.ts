@@ -13,29 +13,26 @@ import {
     UploadPartCommand,
     UploadPartCommandOutput
 } from "@aws-sdk/client-s3";
-import {S3Object} from "./s3Object";
-import {Metadata} from "./Metadata";
-import {IS3Object} from "../interfaces";
-import config from "../config";
-import {S3Lib} from "./s3lib";
+import {S3Object} from "../objects/s3Object";
+import {Metadata} from "../misc/metadata";
+import {IS3Object} from "../../interfaces";
+import config from "../../config";
+import {S3Lib} from "../misc/s3lib";
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
-import {S3ObjectBuilder} from "./s3ObjectBuilder";
+import {S3ObjectBuilder} from "../objects/s3ObjectBuilder";
 import {Readable} from "stream";
 
 /**
  * An unsafe version of S3 bucket with no validation.
  */
 export class S3BucketInternal {
-    //s3
-    private readonly s3: S3;
-
-    //cached
-    private isPublic_cache?: boolean;
-
     //bucket info
     public readonly bucketName: string;
     public readonly bucketUrl: string;
-
+    //s3
+    private readonly s3: S3;
+    //cached
+    private isPublic_cache?: boolean;
 
     /**
      * @internal

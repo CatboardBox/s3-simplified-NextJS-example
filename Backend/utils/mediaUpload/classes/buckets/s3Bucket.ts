@@ -1,9 +1,9 @@
-import {IS3Bucket, IS3Object} from "../interfaces";
-import config from "../config";
-import {S3Lib} from "./s3lib";
-import {ExistingObject, MissingObject} from "./Errors";
+import {IS3Bucket, IS3Object} from "../../interfaces";
+import config from "../../config";
+import {S3Lib} from "../misc/s3lib";
+import {ExistingObject, MissingObject} from "../misc/errors";
 import {S3BucketInternal} from "./s3BucketInternal";
-import {S3ObjectBuilder} from "./s3ObjectBuilder";
+import {S3ObjectBuilder} from "../objects/s3ObjectBuilder";
 
 export class S3Bucket implements IS3Bucket {
     private internal: S3BucketInternal;
@@ -15,14 +15,6 @@ export class S3Bucket implements IS3Bucket {
      */
     constructor(lib: S3Lib, bucketName: string) {
         this.internal = new S3BucketInternal(lib, bucketName);
-    }
-
-    protected async assertExists(key: string): Promise<void> {
-        if (!await this.internal.containsObject(key)) throw new MissingObject(key, this.internal.bucketName);
-    }
-
-    protected async assertNoConflicts(key: string): Promise<void> {
-        if (await this.internal.containsObject(key)) throw new ExistingObject(key, this.internal.bucketName);
     }
 
     public async createObject(s3Object: S3ObjectBuilder): Promise<IS3Object> {
@@ -42,9 +34,17 @@ export class S3Bucket implements IS3Bucket {
         return this.internal.getObject(key);
     }
 
+    public async getObjects(keys: string[]): Promise<IS3Object[]> {
+        return Promise.all(keys.map(key => this.getObject(key)));
+    }
+
     public async deleteObject(key: string): Promise<void> {
         await this.assertExists(key);
         return this.internal.deleteObject(key);
+    }
+
+    public async deleteObjects(keys: string[]): Promise<void> {
+        await Promise.all(keys.map(key => this.deleteObject(key)));
     }
 
     public async renameObject(oldKey: string, newKey: string): Promise<void> {
@@ -58,11 +58,19 @@ export class S3Bucket implements IS3Bucket {
         return Promise.all(promises);
     }
 
-    contains(key: string): Promise<boolean> {
+    public async contains(key: string): Promise<boolean> {
         return this.internal.containsObject(key);
     }
 
-    listContent(): Promise<Array<string>> {
+    public async listContent(): Promise<Array<string>> {
         return this.internal.listContents();
+    }
+
+    protected async assertExists(key: string): Promise<void> {
+        if (!await this.internal.containsObject(key)) throw new MissingObject(key, this.internal.bucketName);
+    }
+
+    protected async assertNoConflicts(key: string): Promise<void> {
+        if (await this.internal.containsObject(key)) throw new ExistingObject(key, this.internal.bucketName);
     }
 }

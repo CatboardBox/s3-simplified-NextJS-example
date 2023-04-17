@@ -1,7 +1,7 @@
 import {Readable} from "stream";
-import {Metadata} from "./Metadata";
-import {IMetadata, IS3Object, IS3ObjectJSON} from "../interfaces";
-import {S3BucketInternal} from "./s3BucketInternal";
+import {Metadata} from "../misc/metadata";
+import {IMetadata, IS3Object, IS3ObjectJSON} from "../../interfaces";
+import {S3BucketInternal} from "../buckets/s3BucketInternal";
 
 export class S3Object implements IS3Object {
     constructor(private metadata: IMetadata = new Metadata(), private bucketSource: S3BucketInternal, private body?: Readable) {
@@ -17,17 +17,6 @@ export class S3Object implements IS3Object {
 
     public get Metadata(): IMetadata {
         return this.metadata;
-    }
-
-    public async generateLink(): Promise<string> {
-        return await this.bucketSource.isPublic() ? this.bucketSource.generatePublicUrl(this.key) : await this.bucketSource.generateSignedUrl(this.key);
-    }
-
-    public async toJSON(): Promise<IS3ObjectJSON> {
-        return {
-            FileLink: await this.generateLink(),
-            Metadata: this.Metadata.Pairs,
-        };
     }
 
     public get DataSize(): number | undefined {
@@ -50,5 +39,16 @@ export class S3Object implements IS3Object {
 
     public get FileName(): string {
         return this.Name + "." + this.Extension;
+    }
+
+    public async generateLink(): Promise<string> {
+        return await this.bucketSource.isPublic() ? this.bucketSource.generatePublicUrl(this.key) : await this.bucketSource.generateSignedUrl(this.key);
+    }
+
+    public async toJSON(): Promise<IS3ObjectJSON> {
+        return {
+            FileLink: await this.generateLink(),
+            Metadata: this.Metadata.Pairs,
+        };
     }
 }

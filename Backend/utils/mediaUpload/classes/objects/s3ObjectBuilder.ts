@@ -1,14 +1,15 @@
 import {Readable} from "stream";
-import {Metadata} from "./Metadata";
-import {generateUUID} from "../utils/GenerateUUID";
+import {Metadata} from "../misc/metadata";
+import {generateUUID} from "../../utils/generateUUID";
 import fs from "fs";
 import {File} from 'formidable';
-import {IMetadata} from "../interfaces";
-import {FileTypeParser} from "../utils/FileTypeParser";
+import {IMetadata} from "../../interfaces";
+import {FileTypeParser} from "../../utils/fileTypeParser";
+import {blobToBuffer, readableStreamToBuffer, readableToBuffer} from "../../utils/convertToBuffer";
 
 type AcceptedDataTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
 
-export class S3ObjectBuilder{
+export class S3ObjectBuilder {
     constructor(private data: AcceptedDataTypes, private metadata: Metadata = new Metadata()) {
         if (this.Name === undefined) this.Name = generateUUID();
     }
@@ -57,53 +58,6 @@ export class S3ObjectBuilder{
         return this.Name + "." + this.Extension;
     }
 
-    public async AsBuffer(): Promise<Buffer> {
-        const data = this.data;
-        if (Buffer.isBuffer(data)) return data;
-        if (data instanceof Uint8Array) return Buffer.from(data.buffer);
-        if (typeof data === 'string') return Buffer.from(data);
-        if (data instanceof Blob) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const buffer = Buffer.from(reader.result as ArrayBuffer);
-                    resolve(buffer);
-                };
-                reader.onerror = reject;
-                reader.readAsArrayBuffer(data);
-            });
-        }
-        if (data instanceof Readable) {
-            return new Promise((resolve, reject) => {
-                const chunks: Uint8Array[] = [];
-                data.on('data', chunk => chunks.push(chunk));
-                data.on('end', () => resolve(Buffer.concat(chunks)));
-                data.on('error', reject);
-            });
-        }
-        // ReadableStream case
-        const reader = data.getReader();
-        const chunks: Uint8Array[] = [];
-
-        return new Promise(async (resolve, reject) => {
-            try {
-                while (true) {
-                    const {done, value} = await reader.read();
-                    if (done) {
-                        resolve(Buffer.concat(chunks));
-                        break;
-                    }
-                    if (value) {
-                        chunks.push(value);
-                    }
-                }
-            } catch (error) {
-                reject(error);
-            }
-        });
-
-    }
-
     public static async fromFile(file: File): Promise<S3ObjectBuilder> {
         return new Promise<S3ObjectBuilder>((resolve, _) => {
             const metadata = new Metadata({
@@ -117,5 +71,17 @@ export class S3ObjectBuilder{
             const s3Object = new S3ObjectBuilder(buffer, metadata)
             return resolve(s3Object);
         });
+    }
+
+    // Some of the methods results in the data being "casted" to a Buffer, while others copy the data directly to a buffer.
+    public async AsBuffer(): Promise<Buffer> {
+        const data = this.data;
+        if (Buffer.isBuffer(data)) return data;
+        if (data instanceof Uint8Array) return Buffer.from(data.buffer);
+        if (typeof data === 'string') return Buffer.from(data);
+        if (data instanceof Blob) return blobToBuffer(data);
+        if (data instanceof Readable) return readableToBuffer(data);
+        if (data instanceof ReadableStream) return readableStreamToBuffer(data);
+        throw new Error("Invalid data type");
     }
 }

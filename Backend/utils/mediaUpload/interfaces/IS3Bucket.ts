@@ -1,5 +1,5 @@
 import {IS3Object} from "./IS3Object";
-import {S3ObjectBuilder} from "../classes/s3ObjectBuilder";
+import {S3ObjectBuilder} from "../classes";
 
 export interface IS3Bucket {
 
@@ -22,10 +22,22 @@ export interface IS3Bucket {
     getObject(key: string): Promise<IS3Object>;
 
     /**
+     * @param keys the key of the object
+     * @returns a promise that resolves to the objects with the given key
+     */
+    getObjects(keys: string[]): Promise<IS3Object[]>;
+
+    /**
      * @param key the key of the object
      * @returns a promise that resolves when the object with the given key is deleted
      */
     deleteObject(key: string): Promise<void>;
+
+    /**
+     * @param keys the key of the objects
+     * @returns a promise that resolves when the objects with the given keys are deleted
+     */
+    deleteObjects(keys: string[]): Promise<void>;
 
     /**
      * @returns a promise that resolves to a list of all objects in the bucket
