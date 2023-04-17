@@ -3,49 +3,52 @@ import {Readable} from "stream";
 import {IS3ObjectJSON} from "./IS3ObjectJSON";
 
 export interface IS3Object {
-
-    get Body(): Readable | undefined
-
     /**
-     * @returns a metadata object
-     * @constructor
+     * Returns a Readable stream containing the object's data.
      */
-    get Metadata(): IMetadata
+    get Body(): Readable | undefined;
 
     /**
-     * @returns the size of the data in bytes
+     * Returns the object's metadata.
      */
-    get DataSize(): number | undefined
+    get Metadata(): IMetadata;
 
     /**
-     * @returns the data file type (e.g. "image/jpeg")
+     * Returns the size of the object's data in bytes.
      */
-    get Type(): string | undefined
+    get DataSize(): number | undefined;
 
     /**
-     * @returns the data file extension (e.g. "jpeg")
-     * @constructor
+     * Returns the MIME type of the object's data (e.g. "image/jpeg").
      */
-    get Extension(): string | undefined
+    get Type(): string | undefined;
 
     /**
-     * @returns the data file name (e.g. "image")
+     * Returns the file extension of the object's data (e.g. "jpeg").
      */
-    get Name(): string
+    get Extension(): string | undefined;
 
     /**
-     * @returns the data file name with extension (e.g. "image.jpeg")
-     * @constructor
+     * Returns the base name of the object's data file (e.g. "image").
      */
-    get FileName(): string
+    get Name(): string;
 
     /**
-     * @returns a promise that resolves to a link to the object
+     * Returns the full name of the object's data file, including extension (e.g. "image.jpeg").
+     */
+    get FileName(): string;
+
+    /**
+     * Generates a link to the S3 object.
+     * If the bucket is public, the default public URL is returned.
+     * If not, a pre-signed URL is generated and returned.
+     * @returns {Promise<string>} A promise that resolves to the URL of the object.
      */
     generateLink(): Promise<string>;
 
     /**
-     * @returns a promise that resolves to a JSON representation of the object
+     * Returns a JSON representation of the S3 object.
+     * @returns {Promise<IS3ObjectJSON>} A promise that resolves to a JSON object with the S3 object's metadata.
      */
     toJSON(): Promise<IS3ObjectJSON>;
 }

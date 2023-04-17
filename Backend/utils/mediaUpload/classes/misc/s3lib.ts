@@ -1,6 +1,6 @@
 import {CreateBucketCommand, DeleteBucketCommand, HeadBucketCommand, ListBucketsCommand, S3} from "@aws-sdk/client-s3";
 import {S3Bucket} from "../buckets/s3Bucket";
-import {IS3, IS3Bucket} from "../../interfaces";
+import {IS3, S3BucketService} from "../../interfaces";
 import {Regions} from "../../types";
 import {InvalidBucketName, MissingBucket} from "./errors";
 import config from "../../config";
@@ -15,7 +15,7 @@ export class S3Lib implements IS3 {
         this.region = region;
     }
 
-    public async createBucket(bucketName: string): Promise<IS3Bucket> {
+    public async createBucket(bucketName: string): Promise<S3BucketService> {
         console.log("Creating bucket: " + bucketName);
         //Naming rules
         // https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
@@ -54,14 +54,14 @@ export class S3Lib implements IS3 {
             : [];
     }
 
-    public async getBucket(bucketName: string): Promise<IS3Bucket> {
+    public async getBucket(bucketName: string): Promise<S3BucketService> {
         if (!await this.containsBucket(bucketName))
             throw new MissingBucket(bucketName)
         return this.getBucketInternal(bucketName);
 
     }
 
-    public async getOrCreateBucket(bucketName: string): Promise<IS3Bucket> {
+    public async getOrCreateBucket(bucketName: string): Promise<S3BucketService> {
         if (await this.containsBucket(bucketName))
             return this.getBucketInternal(bucketName);
         return this.createBucket(bucketName);

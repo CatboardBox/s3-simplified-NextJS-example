@@ -1,11 +1,11 @@
-import {IS3Bucket, IS3Object} from "../../interfaces";
+import {IS3Object, S3BucketService} from "../../interfaces";
 import config from "../../config";
 import {S3Lib} from "../misc/s3lib";
 import {ExistingObject, MissingObject} from "../misc/errors";
 import {S3BucketInternal} from "./s3BucketInternal";
 import {S3ObjectBuilder} from "../objects/s3ObjectBuilder";
 
-export class S3Bucket implements IS3Bucket {
+export class S3Bucket implements S3BucketService {
     private internal: S3BucketInternal;
 
     /**
