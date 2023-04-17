@@ -35,7 +35,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 return;
             }
 
-            if(await imagesBucket.contains(id) === false){
+            if (await imagesBucket.contains(id) === false) {
                 res.status(400).json({message: 'Image does not exist'});
                 return;
             }

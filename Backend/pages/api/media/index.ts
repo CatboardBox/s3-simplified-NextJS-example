@@ -3,13 +3,12 @@ import {S3Lib} from '../../../utils/mediaUpload'
 import {currentBucket} from "../../../utils/currentBucket";
 
 
-
 const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     console.log('Request received')
     try {
         const imagesBucket = await S3Lib.Default.getOrCreateBucket(currentBucket);
         const images = await imagesBucket.getAllObjects();
-        const objects = await Promise.all(images.map(image =>  image.toJSON()))
+        const objects = await Promise.all(images.map(image => image.toJSON()))
         if (!Array.isArray(objects)) {
             res.status(500).json({statusCode: 500, message: "Cannot find image data"});
         }

@@ -11,7 +11,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (req.method === 'OPTIONS') {
         // Preflight request. Reply successfully:
-        res.status(200).json({ message: 'Preflight request successful' });
+        res.status(200).json({message: 'Preflight request successful'});
         return;
     }
     if (req.method === 'DELETE') {

@@ -42,6 +42,8 @@ export class S3Lib implements IS3 {
     }
 
     public async deleteBucket(bucketName: string): Promise<void> {
+        if (!await this.containsBucket(bucketName))
+            throw new MissingBucket(bucketName)
         const command = new DeleteBucketCommand({Bucket: bucketName});
         await this.s3.send(command);
     }

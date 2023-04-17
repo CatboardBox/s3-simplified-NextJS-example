@@ -5,5 +5,7 @@
     "rootDir": ".",
     "outDir": "../node_modules/@shared"
   },
-  "include": ["./**/*"]
+  "include": [
+    "./**/*"
+  ]
 }
