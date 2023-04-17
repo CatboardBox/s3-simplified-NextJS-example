@@ -1,7 +1,15 @@
-// You can include shared interfaces/types in a separate file
-// and then use them in any component by importing them. For
-// example, to import the interface below do:
-//
-// import { User } from 'path/to/interfaces';
+export interface ApiData {
 
-export type ApiData = string;
+    /**
+     * The URL of the S3 object.
+     * @type {string | undefined}
+     */
+    FileLink: string | undefined,
+
+    /**
+     * The metadata associated with the S3 object, as an array of key-value pairs.
+     * @type {[string, string][]}
+     */
+    Metadata: [string, string][],
+}
+

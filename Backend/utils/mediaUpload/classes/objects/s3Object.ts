@@ -12,7 +12,7 @@ export class S3Object implements IS3Object {
     }
 
     public get key(): string {
-        return this.FileName
+        return this.Id
     }
 
     public get Metadata(): IMetadata {
@@ -37,8 +37,8 @@ export class S3Object implements IS3Object {
         return this.metadata.get("Content-Disposition");
     }
 
-    public get FileName(): string {
-        return this.Name + "." + this.Extension;
+    public get Id(): string {
+        return this.metadata.get("identifier");
     }
 
     public async generateLink(): Promise<string> {

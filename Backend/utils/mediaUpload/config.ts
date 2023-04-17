@@ -1,6 +1,6 @@
 import {Regions} from "./types";
 import process from "process";
-import {MB, Minute} from "./utils/Constants";
+import {MB, Minute} from "./utils/constants";
 
 type config = {
     multipartChunkSize: number;
@@ -13,6 +13,7 @@ type config = {
     // noinspection SpellCheckingInspection
     signedUrlExpiration: number,
 }
+
 const config: config = {
     multipartChunkSize: 5 * MB,
     multipartUploadThreshold: 5 * MB,

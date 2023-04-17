@@ -36,7 +36,7 @@ export interface IS3Object {
     /**
      * Returns the full name of the object's data file, including extension (e.g. "image.jpeg").
      */
-    get FileName(): string;
+    get Id(): string;
 
     /**
      * Generates a link to the S3 object.

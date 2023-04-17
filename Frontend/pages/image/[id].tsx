@@ -1,13 +1,9 @@
 import React from "react";
 import Layout from "../../components/Layout";
-
-interface IS3ObjectJSON {
-    FileLink: string | undefined,
-    Metadata: [string, string][]
-}
+import {ApiData} from "../../interfaces";
 
 interface Props {
-    data: IS3ObjectJSON;
+    data: ApiData;
     error?: string;
 }
 

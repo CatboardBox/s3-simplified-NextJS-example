@@ -103,7 +103,7 @@ export class S3BucketInternal {
     public async createObject_Single(s3ObjectBuilder: S3ObjectBuilder): Promise<IS3Object> {
         const command = new PutObjectCommand({
             Bucket: this.bucketName,
-            Key: s3ObjectBuilder.FileName,
+            Key: s3ObjectBuilder.Id,
             Body: s3ObjectBuilder.Body,
             Metadata: s3ObjectBuilder.Metadata.toRecord()
         });
@@ -115,10 +115,10 @@ export class S3BucketInternal {
         // Multipart upload
         console.log("Using multipart upload")
 
-        console.log(s3ObjectBuilder.FileName);
+        console.log(s3ObjectBuilder.Id);
         const createMultipartUploadCommand = new CreateMultipartUploadCommand({
             Bucket: this.bucketName,
-            Key: s3ObjectBuilder.FileName,
+            Key: s3ObjectBuilder.Id,
             Metadata: s3ObjectBuilder.Metadata.toRecord()
         });
         const createMultipartUploadResponse = await this.s3.send(createMultipartUploadCommand);
@@ -130,7 +130,7 @@ export class S3BucketInternal {
 
         console.log(`Uploading ${partsCount} parts...`)
 
-        console.log(s3ObjectBuilder.FileName);
+        console.log(s3ObjectBuilder.Id);
         //Consolidate all the promises into one array and await them all at once rather than one by one
         const promises = new Array<Promise<UploadPartCommandOutput>>(partsCount);
         for (let i = 0; i < partsCount; i++) {
@@ -141,7 +141,7 @@ export class S3BucketInternal {
 
             const uploadPartCommand = new UploadPartCommand({
                 Bucket: this.bucketName,
-                Key: s3ObjectBuilder.FileName,
+                Key: s3ObjectBuilder.Id,
                 UploadId: uploadId,
                 PartNumber: i + 1,
                 Body: partBuffer
@@ -157,10 +157,10 @@ export class S3BucketInternal {
         });
         console.log("Completing multipart upload...")
 
-        console.log(s3ObjectBuilder.FileName);
+        console.log(s3ObjectBuilder.Id);
         const completeMultipartUploadCommand = new CompleteMultipartUploadCommand({
             Bucket: this.bucketName,
-            Key: s3ObjectBuilder.FileName,
+            Key: s3ObjectBuilder.Id,
             UploadId: uploadId,
             MultipartUpload: {
                 Parts: completedParts

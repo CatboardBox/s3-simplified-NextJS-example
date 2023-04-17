@@ -9,12 +9,12 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse) => {
     try {
         const imagesBucket = await S3Lib.Default.getOrCreateBucket(currentBucket);
         const images = await imagesBucket.getAllObjects();
-        const urls = await Promise.all(images.map(image => image.generateLink()))
-        if (!Array.isArray(urls)) {
+        const objects = await Promise.all(images.map(image =>  image.toJSON()))
+        if (!Array.isArray(objects)) {
             res.status(500).json({statusCode: 500, message: "Cannot find image data"});
         }
 
-        res.status(200).json(urls)
+        res.status(200).json(objects)
     } catch (err: any) {
         res.status(500).json({statusCode: 500, message: err.message})
     }

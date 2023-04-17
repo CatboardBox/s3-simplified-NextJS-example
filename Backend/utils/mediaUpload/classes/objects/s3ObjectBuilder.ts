@@ -54,8 +54,12 @@ export class S3ObjectBuilder {
         if (value) this.metadata.set("Content-Disposition", value);
     }
 
-    public get FileName(): string {
-        return this.Name + "." + this.Extension;
+    public get Id(): string {
+        const id = this.metadata.get("identifier");
+        if (id) return id;
+        const newId = this.Name + "." + this.Extension;
+        this.metadata.set("identifier", newId);
+        return newId;
     }
 
     public static async fromFile(file: File): Promise<S3ObjectBuilder> {

@@ -9,7 +9,7 @@ interface Props {
 }
 
 const RemoveImage = (ImageId: string) => {
-    const url = 'http://localhost:3000/api/media/delete?id=' + ImageId.split('?')[0];
+    const url = 'http://localhost:3000/api/media/delete?id=' + ImageId;
     return async (e: React.MouseEvent<HTMLInputElement>) => {
         e.preventDefault();
         try {
@@ -23,21 +23,23 @@ const RemoveImage = (ImageId: string) => {
     }
 }
 
-const ImageLink = (ImageId: string) => () => window.location.pathname = '/image/' + ImageId.split('?')[0];
+const ImageLink = (ImageId: string) => () => window.location.pathname = '/image/' + ImageId;
 
 export const ImageList: React.FC<Props> = ({data}) => {
-    const filteredData = data.filter((item: string) => {
-        const fileExtension = item.split('.').pop().split('?')[0];
+    const filteredData = data.filter((item: ApiData) => {
+        const fileExtension = item.Metadata.find(([key, value]) => key === 'file-type')?.[1];
         return acceptedExtensions.includes(fileExtension);
     });
     return (
         <>
             <h2>Images</h2>
             {
-                filteredData.map((item: string) => {
-                    const id = item.split('/').pop();
+                filteredData.map((item: ApiData) => {
+                    const id = item.Metadata.find(([key, value]) => key === 'identifier')?.[1];
+                    const originalFile = item.Metadata.find(([key, value]) => key === 'original-name')?.[1];
+                    const url = item.FileLink;
                     return <>
-                        <img src={item} alt={item} key={item} onClick={ImageLink(id)}/>
+                        <img src={url} alt={originalFile} key={id} onClick={ImageLink(id)}/>
                         <button onClick={RemoveImage(id)}>Remove</button>
                     </>;
                 })
