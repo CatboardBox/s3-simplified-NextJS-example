@@ -31,7 +31,7 @@ export interface IS3Object {
     /**
      * Returns the base name of the object's data file (e.g. "image").
      */
-    get Name(): string;
+    get UUID(): string;
 
     /**
      * Returns the full name of the object's data file, including extension (e.g. "image.jpeg").

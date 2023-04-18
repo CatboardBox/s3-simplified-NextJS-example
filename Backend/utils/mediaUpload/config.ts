@@ -12,6 +12,10 @@ type config = {
 
     // noinspection SpellCheckingInspection
     signedUrlExpiration: number,
+    /**
+     * This would only affect new uploads, not existing ones
+     */
+    appendFileTypeToKey: boolean,
 }
 
 const config: config = {
@@ -23,5 +27,6 @@ const config: config = {
     secretAccessKey: process.env.secretAccessKey,
 
     signedUrlExpiration: 5 * Minute,
+    appendFileTypeToKey: true,
 }
 export default config

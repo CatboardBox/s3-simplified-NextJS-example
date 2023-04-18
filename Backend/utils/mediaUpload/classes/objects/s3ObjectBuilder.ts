@@ -6,12 +6,13 @@ import {File} from 'formidable';
 import {IMetadata} from "../../interfaces";
 import {FileTypeParser} from "../../utils/fileTypeParser";
 import {blobToBuffer, readableStreamToBuffer, readableToBuffer} from "../../utils/convertToBuffer";
+import config from "../../config";
 
 type AcceptedDataTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
 
 export class S3ObjectBuilder {
     constructor(private data: AcceptedDataTypes, private metadata: Metadata = new Metadata()) {
-        if (this.Name === undefined) this.Name = generateUUID();
+        if (this.UUID === undefined) this.UUID = generateUUID();
     }
 
     public get Body(): AcceptedDataTypes {
@@ -32,13 +33,13 @@ export class S3ObjectBuilder {
         return this.metadata.get("Content-Type");
     }
 
-    public set Type(value: string | undefined) {
-        if (value) this.metadata.set("Content-Type", value);
-    }
-
     public get Extension(): string | undefined {
         const ext = this.metadata.get("File-Type");
         if (ext) return ext;
+        return this.generateExtension();
+    }
+
+    private generateExtension(): string | undefined {
         const type = this.Type;
         if (type === undefined) return undefined;
         const fileType = FileTypeParser(type);
@@ -46,18 +47,24 @@ export class S3ObjectBuilder {
         return fileType;
     }
 
-    public get Name(): string {
+    public get UUID(): string {
         return this.metadata.get("Content-Disposition");
     }
 
-    public set Name(value: string) {
+    private set UUID(value: string) {
         if (value) this.metadata.set("Content-Disposition", value);
     }
 
     public get Id(): string {
         const id = this.metadata.get("identifier");
         if (id) return id;
-        const newId = this.Name + "." + this.Extension;
+        return this.generateIdentifier();
+    }
+
+    private generateIdentifier(): string {
+        const uuid = this.UUID;
+        const ext = this.Extension; // This will generate the extension if it doesn't exist, so we call it even if we don't need it.
+        const newId = (config.appendFileTypeToKey) ? uuid + "." + ext : uuid;
         this.metadata.set("identifier", newId);
         return newId;
     }

@@ -33,7 +33,7 @@ export class S3Object implements IS3Object {
         return this.metadata.get("File-Type");
     }
 
-    public get Name(): string {
+    public get UUID(): string {
         return this.metadata.get("Content-Disposition");
     }
 
