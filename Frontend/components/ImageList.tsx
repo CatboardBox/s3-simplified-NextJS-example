@@ -26,18 +26,24 @@ const RemoveImage = (ImageId: string) => {
 const ImageLink = (ImageId: string) => () => window.location.pathname = '/image/' + ImageId;
 
 export const ImageList: React.FC<Props> = ({data}) => {
-    const filteredData = data.filter((item: ApiData) => {
-        const fileExtension = item.Metadata.find(([key, value]) => key === 'file-type')?.[1];
-        return acceptedExtensions.includes(fileExtension);
+    const parsedData = data.map((item: ApiData) => {
+        const id = item.Metadata.find(([key]) => key === 'identifier')?.[1];
+        const originalFile = item.Metadata.find(([key]) => key === 'original-name')?.[1];
+        const fileExtension = item.Metadata.find(([key]) => key === 'file-type')?.[1];
+        const url = item.FileLink;
+        return {id, originalFile, fileExtension, url};
+    });
+    const filteredData = parsedData.filter((item) => {
+        if (acceptedExtensions.includes(item.fileExtension)) {
+            return item;
+        }
     });
     return (
         <>
             <h2>Images</h2>
             {
-                filteredData.map((item: ApiData) => {
-                    const id = item.Metadata.find(([key, value]) => key === 'identifier')?.[1];
-                    const originalFile = item.Metadata.find(([key, value]) => key === 'original-name')?.[1];
-                    const url = item.FileLink;
+                filteredData.map((item) => {
+                    const {id, originalFile, url} = item;
                     return <>
                         <img src={url} alt={originalFile} key={id} onClick={ImageLink(id)}/>
                         <button onClick={RemoveImage(id)}>Remove</button>
