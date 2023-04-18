@@ -1,5 +1,5 @@
 import {IS3Object, S3BucketService} from "../../interfaces";
-import config from "../../config";
+import config from "../../configTemplate";
 import {S3Lib} from "../misc/s3lib";
 import {ExistingObject, MissingObject} from "../misc/errors";
 import {S3BucketInternal} from "./s3BucketInternal";
@@ -21,7 +21,7 @@ export class S3Bucket implements S3BucketService {
         await this.assertNoConflicts(s3Object.Id);
         const size = s3Object.DataSize;
         if (size === undefined) throw new Error("Data size is undefined");
-        return size <= config.multipartUploadThreshold ? this.internal.createObject_Single(s3Object) : this.internal.createObject_Multipart(s3Object);
+        return size <= config.multiPartUpload.enabledThreshold ? this.internal.createObject_Single(s3Object) : this.internal.createObject_Multipart(s3Object);
     }
 
     public async createObjectFromFile(file: File): Promise<IS3Object> {

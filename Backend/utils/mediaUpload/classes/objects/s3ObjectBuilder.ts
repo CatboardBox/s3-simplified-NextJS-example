@@ -6,7 +6,7 @@ import {File} from 'formidable';
 import {IMetadata} from "../../interfaces";
 import {FileTypeParser} from "../../utils/fileTypeParser";
 import {blobToBuffer, readableStreamToBuffer, readableToBuffer} from "../../utils/convertToBuffer";
-import config from "../../config";
+import config from "../../configTemplate";
 
 type AcceptedDataTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
 

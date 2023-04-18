@@ -3,14 +3,14 @@ import {S3Bucket} from "../buckets/s3Bucket";
 import {IS3, S3BucketService} from "../../interfaces";
 import {Regions} from "../../types";
 import {InvalidBucketName, MissingBucket} from "./errors";
-import config from "../../config";
+import config from "../../configTemplate";
 
 export class S3Lib implements IS3 {
     public static readonly Default: IS3 = new S3Lib();
     public readonly s3: S3;
     public readonly region: Regions;
 
-    constructor(region: Regions = config.region, accessKeyId: string = config.accessKeyId, secretAccessKey: string = config.secretAccessKey) {
+    constructor(region: Regions = config.region, accessKeyId: string = config.accessKey.id, secretAccessKey: string = config.accessKey.secret) {
         this.s3 = new S3({region, credentials: {accessKeyId, secretAccessKey}});
         this.region = region;
     }

@@ -16,7 +16,7 @@ import {
 import {S3Object} from "../objects/s3Object";
 import {Metadata} from "../misc/metadata";
 import {IS3Object} from "../../interfaces";
-import config from "../../config";
+import config from "../../configTemplate";
 import {S3Lib} from "../misc/s3lib";
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import {S3ObjectBuilder} from "../objects/s3ObjectBuilder";
@@ -93,7 +93,7 @@ export class S3BucketInternal {
         return getSignedUrl(this.s3, new GetObjectCommand({
             Bucket: this.bucketName,
             Key: key
-        }), {expiresIn: config.signedUrlExpiration});
+        }), {expiresIn: config.signedUrl.expiration});
     }
 
     public generatePublicUrl(key: string): string {
@@ -125,7 +125,7 @@ export class S3BucketInternal {
         const uploadId = createMultipartUploadResponse.UploadId;
         if (!uploadId) throw new Error("Failed to initialize multipart upload");
 
-        const partSize = config.multipartChunkSize;
+        const partSize = config.multiPartUpload.maxPartSize;
         const partsCount = Math.ceil(s3ObjectBuilder.DataSize / partSize);
 
         console.log(`Uploading ${partsCount} parts...`)
