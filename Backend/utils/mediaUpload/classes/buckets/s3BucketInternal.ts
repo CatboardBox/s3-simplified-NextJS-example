@@ -30,7 +30,7 @@ export class S3BucketInternal {
     public readonly bucketName: string;
     public readonly bucketUrl: string;
     //s3
-    private readonly s3: S3;
+    protected readonly s3: S3;
     //cached
     private isPublic_cache?: boolean;
 
@@ -45,8 +45,12 @@ export class S3BucketInternal {
         this.bucketName = bucketName;
     }
 
-
-    private static async IsPublic_Internal(bucket: S3BucketInternal): Promise<boolean> {
+    /**
+     * Fetches the bucket ACL and bucket policy to determine if the bucket is public.
+     * @param bucket The bucket to check
+     * @see {@link isPublic} for a cached version of this function
+     */
+    protected static async fetchPublicStatus(bucket: S3BucketInternal): Promise<boolean> {
         const aclResponse = await bucket.getBucketACL();
 
         for (const grant of aclResponse.Grants || []) {
@@ -84,7 +88,7 @@ export class S3BucketInternal {
 
 
     public async isPublic(): Promise<boolean> {
-        if (this.isPublic_cache === undefined) this.isPublic_cache = await S3BucketInternal.IsPublic_Internal(this);
+        if (this.isPublic_cache === undefined) this.isPublic_cache = await S3BucketInternal.fetchPublicStatus(this);
         return this.isPublic_cache;
     }
 

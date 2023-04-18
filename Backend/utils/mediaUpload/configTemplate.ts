@@ -17,6 +17,7 @@ export interface configTemplate {
     /**
      * The region of the aws to fetch the bucket from
      * This setting only affects {@link S3Lib.Default}, if the multiple regions are needed, construct {@link S3Lib} directly
+     * @see {@link Regions}
      */
     region: Regions,
 
