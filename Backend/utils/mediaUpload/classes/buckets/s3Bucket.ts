@@ -1,5 +1,5 @@
 import {IS3Object, S3BucketService} from "../../interfaces";
-import config from "../../configTemplate";
+import config from "../../config";
 import {S3Lib} from "../misc/s3lib";
 import {ExistingObject, MissingObject} from "../misc/errors";
 import {S3BucketInternal} from "./s3BucketInternal";

@@ -16,7 +16,7 @@ import {
 import {S3Object} from "../objects/s3Object";
 import {Metadata} from "../misc/metadata";
 import {IS3Object} from "../../interfaces";
-import config from "../../configTemplate";
+import config from "../../config";
 import {S3Lib} from "../misc/s3lib";
 import {getSignedUrl} from '@aws-sdk/s3-request-presigner';
 import {S3ObjectBuilder} from "../objects/s3ObjectBuilder";

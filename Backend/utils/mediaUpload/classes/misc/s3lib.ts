@@ -3,7 +3,7 @@ import {S3Bucket} from "../buckets/s3Bucket";
 import {IS3, S3BucketService} from "../../interfaces";
 import {Regions} from "../../types";
 import {InvalidBucketName, MissingBucket} from "./errors";
-import config from "../../configTemplate";
+import config from "../../config";
 
 export class S3Lib implements IS3 {
     public static readonly Default: IS3 = new S3Lib();

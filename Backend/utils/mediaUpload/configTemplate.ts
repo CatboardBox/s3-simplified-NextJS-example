@@ -1,11 +1,9 @@
 import {Regions} from "./types";
-import process from "process";
-import {MB, Minute} from "./utils/constants";
 
 /**
  * The configuration for the s3 library
  */
-interface configTemplate {
+export interface configTemplate {
 
     /**
      * The access key and secret access key of the aws account
@@ -57,24 +55,3 @@ interface configTemplate {
      */
     appendFileTypeToKey: boolean,
 }
-
-const config: configTemplate = {
-    accessKey: {
-        id: process.env.accessKey,
-        secret: process.env.secretAccessKey,
-    },
-
-    region: "ap-southeast-1",
-
-    multiPartUpload: {
-        maxPartSize: 5 * MB,
-        enabledThreshold: 5 * MB,
-    },
-
-    signedUrl: {
-        expiration: 5 * Minute,
-    },
-
-    appendFileTypeToKey: true,
-}
-export default config
