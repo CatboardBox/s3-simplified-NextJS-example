@@ -40,4 +40,4 @@ The frontend is hosted on `localhost:8000` and the backend is hosted on `localho
 
 ## MediaUpload
 
-for more information on this, check out the dedicated [README](/Backend/utils/mediaUpload/README.md)
+for more information on this, check out the dedicated [README](/Backend/utils/s3-simplified/README.md)

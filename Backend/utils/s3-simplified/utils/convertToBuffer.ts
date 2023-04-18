@@ -22,7 +22,7 @@ export function readableToBuffer(stream: Readable): Promise<Buffer> {
 }
 
 export function readableStreamToBuffer(stream: ReadableStream): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
+    return new Promise(() => {
         const reader = stream.getReader();
         const chunks: Uint8Array[] = [];
 

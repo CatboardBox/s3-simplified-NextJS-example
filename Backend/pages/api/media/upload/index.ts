@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from 'next';
 import {File} from 'formidable';
-import {S3Lib} from "../../../../utils/mediaUpload";
+import {S3Lib} from "../../../../utils/s3-simplified";
 import {parseFormData} from "../../../../utils/parseFormData";
 import {currentBucket} from "../../../../currentBucket";
 

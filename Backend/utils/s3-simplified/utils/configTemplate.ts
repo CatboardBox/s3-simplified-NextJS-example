@@ -1,4 +1,5 @@
-import {Regions} from "./types";
+import {Regions} from "../types";
+import {MB, Minute} from "./constants";
 
 /**
  * The configuration for the s3 library
@@ -55,4 +56,17 @@ export interface configTemplate {
      * @note This would only affect new uploads, not existing ones
      */
     appendFileTypeToKey: boolean,
+}
+
+export const defaultConfig: Partial<configTemplate> = {
+    multiPartUpload: {
+        maxPartSize: 5 * MB,
+        enabledThreshold: 5 * MB,
+    },
+
+    signedUrl: {
+        expiration: 5 * Minute,
+    },
+
+    appendFileTypeToKey: false,
 }

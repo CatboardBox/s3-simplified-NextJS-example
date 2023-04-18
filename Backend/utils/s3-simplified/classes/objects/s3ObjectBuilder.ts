@@ -6,7 +6,7 @@ import {File} from 'formidable';
 import {IMetadata} from "../../interfaces";
 import {FileTypeParser} from "../../utils/fileTypeParser";
 import {blobToBuffer, readableStreamToBuffer, readableToBuffer} from "../../utils/convertToBuffer";
-import config from "../../config";
+import {getConfig} from "../../utils/config";
 
 type AcceptedDataTypes = Readable | ReadableStream | Blob | string | Uint8Array | Buffer
 
@@ -64,7 +64,7 @@ export class S3ObjectBuilder {
     private generateIdentifier(): string {
         const uuid = this.UUID;
         const ext = this.Extension; // This will generate the extension if it doesn't exist, so we call it even if we don't need it.
-        const newId = (config.appendFileTypeToKey) ? uuid + "." + ext : uuid;
+        const newId = (getConfig().appendFileTypeToKey) ? uuid + "." + ext : uuid;
         this.metadata.set("identifier", newId);
         return newId;
     }

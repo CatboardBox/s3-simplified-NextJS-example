@@ -71,7 +71,7 @@ this information include the file's metadata, the file's url
 
 This allows the user to upload larger files to AWS S3 without having to worry about multipart upload.
 
-the settings related to multipart upload can be configured in the [config file](/Backend/utils/mediaUpload/config.ts).
+the settings related to multipart upload can be configured in the [config file](/Backend/utils/s3-simplified/utils/configTemplate.ts).
 
 ## Automatic url generation
 
@@ -82,4 +82,4 @@ private bucket, the url will be generated automatically using the presigned url 
 ## Highly customizable
 
 This utility is highly customizable, you can change the settings in
-the [config file](/Backend/utils/mediaUpload/config.ts)
+the [config file](/Backend/utils/s3-simplified/utils/configTemplate.ts)

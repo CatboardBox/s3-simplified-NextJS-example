@@ -1,6 +1,6 @@
 // noinspection JSUnusedLocalSymbols
 
-const publicBucket = "imagebuckettesting";
-const nonPublicBucket = "imagebuckettestingbutpublic"
+const nonpublicBucket = "imagebuckettesting";
+const publicBucket = "imagebuckettestingbutpublic"
 
-export const currentBucket = nonPublicBucket
+export const currentBucket = publicBucket
