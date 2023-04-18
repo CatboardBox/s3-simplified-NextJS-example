@@ -1,6 +1,6 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {S3Lib} from "../../../../utils/mediaUpload";
-import {currentBucket} from "../../../../utils/currentBucket";
+import {currentBucket} from "../../../../currentBucket";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log('Request received')
