@@ -13,13 +13,6 @@ export interface S3BucketService {
     createObject(s3ObjectBuilder: S3ObjectBuilder): Promise<IS3Object>;
 
     /**
-     * Creates an S3 object from a File.
-     * @param {File} file - The file to be created.
-     * @returns {Promise<IS3Object>} - A promise that resolves with the created object.
-     */
-    createObjectFromFile(file: File): Promise<IS3Object>;
-
-    /**
      * Retrieves an S3 object with the specified key.
      * @param {string} key - The key of the object to retrieve.
      * @returns {Promise<IS3Object>} - A promise that resolves with the retrieved object.

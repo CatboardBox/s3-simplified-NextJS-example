@@ -1,5 +1,5 @@
 import {NextApiRequest, NextApiResponse} from "next";
-import {S3Lib} from "../../../../utils/s3-simplified";
+import {S3Lib} from "s3-simplified";
 import {currentBucket} from "../../../../currentBucket";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

@@ -18,7 +18,10 @@
     "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\""
   },
   "devDependencies": {
+    "@types/node": "^18.15.11",
+    "@types/react": "^18.0.37",
     "concurrently": "latest",
-    "typescript": "latest"
+    "tsconfig-paths-webpack-plugin": "^4.0.1",
+    "typescript": "^5.0.4"
   }
 }

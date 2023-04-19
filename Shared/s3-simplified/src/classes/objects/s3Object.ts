@@ -34,11 +34,15 @@ export class S3Object implements IS3Object {
     }
 
     public get UUID(): string {
-        return this.metadata.get("Content-Disposition");
+        const uuid = this.metadata.get("Content-Disposition");
+        if (uuid) return uuid;
+        throw new Error("UUID not found");
     }
 
     public get Id(): string {
-        return this.metadata.get("identifier");
+        const id = this.metadata.get("identifier");
+        if (id) return id;
+        return this.UUID;
     }
 
     public async generateLink(): Promise<string> {

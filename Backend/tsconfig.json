@@ -19,8 +19,8 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@MediaUploadLibrary/*": [
-        "../MediaUploadLibrary/*"
+      "s3-simplified": [
+        "../shared/s3-simplified/dist"
       ]
     },
     "incremental": true
@@ -28,7 +28,8 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx",
+    "../shared/**/*.ts"
   ],
   "exclude": [
     "node_modules"

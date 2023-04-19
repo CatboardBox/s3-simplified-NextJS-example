@@ -35,6 +35,7 @@ export interface IS3Object {
 
     /**
      * Returns the full name of the object's data file, including extension (e.g. "image.jpeg").
+     * If the object has no id saved in its metadata, the UUID is used instead.
      */
     get Id(): string;
 

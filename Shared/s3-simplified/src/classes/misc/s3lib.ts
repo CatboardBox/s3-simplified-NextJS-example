@@ -75,6 +75,7 @@ export class S3Lib implements IS3 {
             await this.s3.send(command);
             return true;
         } catch (error) {
+            // @ts-ignore
             if (error.name === undefined || error.name !== "NoSuchBucket") throw error;
             return false;
         }

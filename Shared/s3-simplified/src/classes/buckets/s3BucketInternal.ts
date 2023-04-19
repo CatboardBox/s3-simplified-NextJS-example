@@ -54,6 +54,7 @@ export class S3BucketInternal {
         const aclResponse = await bucket.getBucketACL();
 
         for (const grant of aclResponse.Grants || []) {
+            if(grant.Grantee === undefined) continue;
             if ((grant.Grantee.URI === "http://acs.amazonaws.com/groups/global/AllUsers" || grant.Grantee.URI === "http://acs.amazonaws.com/groups/global/AuthenticatedUsers")
                 && (grant.Permission === "READ" || grant.Permission === "FULL_CONTROL")) {
                 return true;
@@ -63,6 +64,7 @@ export class S3BucketInternal {
         try {
 
             const policyResponse = await bucket.getBucketPolicies();
+            if(policyResponse.Policy === undefined) return false;
             const policy = JSON.parse(policyResponse.Policy);
 
             for (const statement of policy.Statement) {
@@ -79,6 +81,7 @@ export class S3BucketInternal {
                 }
             }
         } catch (error) {
+            // @ts-ignore
             if (error.name !== "NoSuchBucketPolicy") {
                 throw error;
             }
@@ -230,6 +233,7 @@ export class S3BucketInternal {
             await this.s3.send(command);
             return true;
         } catch (error) {
+            // @ts-ignore
             if (error.name === "NotFound") return false;
             throw error;
         }

@@ -1,8 +1,6 @@
 import {Readable} from "stream";
 import {Metadata} from "../misc/metadata";
 import {generateUUID} from "../../utils/generateUUID";
-import fs from "fs";
-import {File} from 'formidable';
 import {IMetadata} from "../../interfaces";
 import {FileTypeParser} from "../../utils/fileTypeParser";
 import {blobToBuffer, readableStreamToBuffer, readableToBuffer} from "../../utils/convertToBuffer";
@@ -23,9 +21,9 @@ export class S3ObjectBuilder {
         return this.metadata;
     }
 
-    public get DataSize(): number | undefined {
+    public get DataSize(): number {
         const sizeStr = this.metadata.get("Content-Length");
-        if (sizeStr === undefined) return undefined;
+        if (sizeStr === undefined) throw new Error("Content-Length is undefined");
         return parseInt(sizeStr);
     }
 
@@ -48,7 +46,11 @@ export class S3ObjectBuilder {
     }
 
     public get UUID(): string {
-        return this.metadata.get("Content-Disposition");
+        const uuid = this.metadata.get("Content-Disposition");
+        if (uuid) return uuid;
+        const newUuid = generateUUID();
+        this.UUID = newUuid;
+        return newUuid;
     }
 
     private set UUID(value: string) {
@@ -67,21 +69,6 @@ export class S3ObjectBuilder {
         const newId = (getConfig().appendFileTypeToKey) ? uuid + "." + ext : uuid;
         this.metadata.set("identifier", newId);
         return newId;
-    }
-
-    public static async fromFile(file: File): Promise<S3ObjectBuilder> {
-        return new Promise<S3ObjectBuilder>((resolve, _) => {
-            const metadata = new Metadata({
-                "content-type": file.mimetype,
-                "content-length": file.size,
-                "original-name": file.originalFilename,
-                "content-disposition": file.newFilename,
-            });
-            const fileLocation = file.filepath;
-            const buffer: Buffer = fs.readFileSync(fileLocation)
-            const s3Object = new S3ObjectBuilder(buffer, metadata)
-            return resolve(s3Object);
-        });
     }
 
     // Some of the methods results in the data being "casted" to a Buffer, while others copy the data directly to a buffer.

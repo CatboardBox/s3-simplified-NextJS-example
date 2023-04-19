@@ -1,5 +1,6 @@
 import {Regions} from "../types";
 import {MB, Minute} from "./constants";
+import {S3Lib} from "../classes";
 
 /**
  * The configuration for the s3 library

@@ -24,11 +24,6 @@ export class S3Bucket implements S3BucketService {
         return size <= getConfig().multiPartUpload.enabledThreshold ? this.internal.createObject_Single(s3Object) : this.internal.createObject_Multipart(s3Object);
     }
 
-    public async createObjectFromFile(file: File): Promise<IS3Object> {
-        const s3Object = await S3ObjectBuilder.fromFile(file);
-        return await this.createObject(s3Object);
-    }
-
     public async getObject(key: string): Promise<IS3Object> {
         await this.assertExists(key);
         return this.internal.getObject(key);
