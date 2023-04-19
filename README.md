@@ -1,6 +1,6 @@
-# MediaUpload
+# s3-simplified example
 
-Testing AWS S3
+Testing AWS S3 with s3-simplified
 
 ## Installation
 
@@ -38,6 +38,6 @@ or run `npm build` followed by `npm start` to start the server (in production mo
 
 The frontend is hosted on `localhost:8000` and the backend is hosted on `localhost:3000`
 
-## MediaUpload
+## s3-simplified
 
-for more information on this, check out the dedicated [README](/Backend/utils/s3-simplified/README.md)
+for more information on this project, check out the [GitHub repository](https://github.com/catcd1w3r5/s3-simplified)
