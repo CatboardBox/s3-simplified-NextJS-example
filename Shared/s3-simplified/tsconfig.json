@@ -14,16 +14,10 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "s3-simplified": [
-        "../shared/s3-simplified/dist"
-      ]
-    }
+    "baseUrl": "."
   },
   "include": [
-    "src/**/*",
-    "shared/**/*"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

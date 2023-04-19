@@ -1,4 +1,4 @@
-import {configTemplate} from "./utils/s3-simplified";
+import {configTemplate} from "s3-simplified";
 import process from "process";
 
 
