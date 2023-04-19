@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "s3-simplified": [
-        "../shared/s3-simplified/dist"
+        "../packages/s3-simplified/dist"
       ]
     },
     "incremental": true
@@ -28,7 +28,7 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
-    "../shared/**/*.ts"
+    "../Packages/**/*.ts"
   ],
   "exclude": [
     "node_modules"
