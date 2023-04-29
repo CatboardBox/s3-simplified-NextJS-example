@@ -1,6 +1,7 @@
 import {NextApiRequest, NextApiResponse} from "next";
 import {S3Lib} from "s3-simplified";
 import {currentBucket} from "../../../../currentBucket";
+import {getS3} from "../../../../utils/getS3";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     console.log('Request received')
@@ -31,7 +32,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             // Delete the data using the ID
             // For example, if you're using a database, remove the record with the specified ID
             console.log(`Deleting data with ID: ${id}`);
-            const imagesBucket = await S3Lib.Default.getOrCreateBucket(currentBucket);
+            const imagesBucket = await getS3().getOrCreateBucket(currentBucket);
             const containsImage = imagesBucket.contains(id);
             if (!containsImage) {
                 res.status(400).json({message: 'Image does not exist'});

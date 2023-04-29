@@ -3,4 +3,4 @@
 const nonpublicBucket = "imagebuckettesting";
 const publicBucket = "imagebuckettestingbutpublic"
 
-export const currentBucket = publicBucket
+export const currentBucket = nonpublicBucket

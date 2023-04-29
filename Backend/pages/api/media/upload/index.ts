@@ -3,6 +3,7 @@ import {File} from 'formidable';
 import {Metadata, S3Lib, S3ObjectBuilder} from 's3-simplified';
 import {parseFormData} from "../../../../utils/parseFormData";
 import {currentBucket} from "../../../../currentBucket";
+import {getS3} from "../../../../utils/getS3";
 import fs from "fs";
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -11,7 +12,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             const data = await parseFormData(req);
             const file: File = data.files.file
 
-            const imagesBucket = await S3Lib.Default.getOrCreateBucket(currentBucket);
+            const s3 = getS3();
+            const imagesBucket = await getS3().getOrCreateBucket(currentBucket);
             const metadata = new Metadata({
                 "content-type": file.mimetype,
                 "content-length": file.size,
