@@ -18,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
                 "content-type": file.mimetype,
                 "content-length": file.size,
                 "original-name": file.originalFilename,
-                "content-disposition": file.newFilename,
+                // "content-disposition": file.newFilename,
             });
             const fileLocation = file.filepath;
             const buffer: Buffer = fs.readFileSync(fileLocation)
