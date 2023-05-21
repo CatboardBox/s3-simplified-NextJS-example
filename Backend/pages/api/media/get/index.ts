@@ -30,7 +30,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         try {
 
             const imagesBucket = await getS3().getOrCreateBucket(currentBucket);
-            const containsImage = imagesBucket.contains(id);
+            const containsImage = await imagesBucket.contains(id);
             if (!containsImage) {
                 res.status(400).json({message: 'Image does not exist'});
                 return;
