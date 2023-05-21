@@ -33,8 +33,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             // For example, if you're using a database, remove the record with the specified ID
             console.log(`Deleting data with ID: ${id}`);
             const imagesBucket = await getS3().getOrCreateBucket(currentBucket);
-            const containsImage = imagesBucket.contains(id);
-            if (!containsImage) {
+            if (await imagesBucket.contains(id) === false) {
                 res.status(400).json({message: 'Image does not exist'});
                 return;
             }
